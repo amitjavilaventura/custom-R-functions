@@ -10,7 +10,7 @@
 #   -Change the legend position
 #   -Changed color and position of the number of up/down DEGs
 
-VolcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30), main = NULL, title_size = 9, 
+volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30), main = NULL, title_size = 9, 
                          labelSize = 7, labelColor = c("green", "darkred"), labelPos = 0,
                          pval = 0.05, log2FC = 1.5, xlab = "log2(FC)", ylab = "-log10(pval)", axis_label_size = 7, axis_text_size = 7, 
                          point.color = c("darkgreen", "gray", "red"), legend_title = FALSE, legend_pos = "bottom", 

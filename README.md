@@ -12,7 +12,7 @@ Paths may have to be changed depending on the current directory where `here` wor
 
 ## `chromReads.R`
 
-### `chromReads.R`
+### `chromReads`
 
 Takes the `bam` files and counts the aligned reads in each chromosome and then plots a bar graph.
 Note that this function won't count nor plot the reads aligned to strange (i.e. *unknown* or *random*) chromosomes.
@@ -25,7 +25,7 @@ Packages used:
 
 ## `pcaplot2.R`
 
-### `pcaplot2()`
+### `pcaplot2`
 
 It is a modification of the function `pcaplot` from R package `pcaExplorer` that allows to change points shapes.
 
@@ -40,11 +40,11 @@ Packages used:
 
 It includes two functions:
 	
-### `filterAnno2()`
+### `filterAnno2`
 
 Takes the output of `annotatePeak` function from `ChIPseeker` package and changes the annotation features to "Promoter" and "Distal". 
 
-### `pieAnno2()` 
+### `pieAnno2` 
 
 Takes the output of `annotatePeak`, calls `filterAnno2` and plots a ggplot2-based pie chart with only distal and promoter features.
 
@@ -56,7 +56,7 @@ Packages used:
 
 It includes two functions:
 	
-### `filterAnno3()`
+### `filterAnno3`
 
 Takes the output of �`annotatePeak and changes the annotation features to "Promoter", "Gene body" or "Distal". 
 
@@ -68,7 +68,7 @@ Packages used:
 
 ## `volcanoplot2.R`
 
-### `VolcanoPlot2()`
+### `volcanoPlot2`
 
 Modification of a function made by dfernandezperez in his RNAseq_snakemake pipeline.
 
@@ -79,4 +79,4 @@ ggplot2-based function that draws a volcanoplot with the output of a DESeq analy
 Packages used:
 
 * ggplot2
-* dplyr# Custom R functions
+* dplyr
