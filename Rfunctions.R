@@ -1,0 +1,46 @@
+######################
+# R CUSTOM FUNCTIONS #
+######################
+
+# The paths may have to be changed depending on the current working directory
+
+if(!require(here)){ install.packages("here") }; library(here)
+
+# ----- chromReads ----- #
+# To count and plot the reads mapped in each chromosome
+source(here("R/chromReads.R"))
+
+# ----- pcaplot2 ----- #
+# A function to plot the principal components analysis
+source(here("R/pcaplot2.R"))
+
+# ----- volcanoplot2 ----- #
+# A function to draw volcano plots
+source(here("R/volcanoplot2.R"))
+
+# ----- pieAnno2 ----- #
+# pieAnno2 -> A function to draw pie charts with the peaks divided by promoter and distal (all non promoter).
+# filterAnno2 -> A function that takes the output of Annotate peak and changes the features to promoter or distal. 
+source(here("R/pieAnno2.R"))
+
+# ----- pieAnno3 ----- #
+# pieAnno3 -> A function to draw pie charts with the peaks divided by promoter, gene body (UTRs, introns, exons) and distal (distal intergeninc, downstream).
+# filterAnno3 -> A function that takes the output of Annotate peak and changes the features to promoter or distal. 
+source(here("R/pieAnno3.R"))
+
+# ----- GOenrichment ----- #
+# A function that does enrichGO
+# Author: dfernandezperez
+goEnrichment <- function(df, ont = "BP", db = org.Mm.eg.db) {
+  require(clusterProfiler)
+  require(db)
+  ego <- enrichGO(gene          = df$ENTREZID,
+                  OrgDb         = db,
+                  keyType       = 'ENTREZID',
+                  ont           = ont,
+                  pAdjustMethod = "BH",
+                  pvalueCutoff  = 0.05,
+                  qvalueCutoff  = 0.1,
+                  readable = TRUE)
+  return(ego)
+}
