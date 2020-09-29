@@ -61,7 +61,9 @@ It includes two functions:
 
 Takes the output of �`annotatePeak and changes the annotation features to "Promoter", "Gene body" or "Distal". 
 
-### `pieAnno3`: takes the output of `annotaePeak`, calls `filterAnno3` and plots a ggplot2-based pie chart with only distal, promoter and gene body regions. 
+### `pieAnno3`
+
+Takes the output of `annotaePeak`, calls `filterAnno3` and plots a ggplot2-based pie chart with only distal, promoter and gene body regions. 
 
 Packages used:
 
