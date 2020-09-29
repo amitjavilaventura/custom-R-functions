@@ -32,11 +32,10 @@
 #' @param legendTitle Logical. If FALSE, the title of the legend is not plotted. Default: FALSE.
 #' @param legendPos Character. Position of the legend. One of: "bottom", "top", "right", "left", "none". Default: "bottom".
 #' @param degsLabel Logical. If TRUE, the most differentially expressed genes are labelled. Default: FALSE.
-#' @param degsLabelNum Numerical. Number of most expressed genes to label in the plot. Default: 5.
+#' @param degsLabelNum Numerical. Number of most expressed genes to label in the plot. The double of this number will be labelled (once for DEGs with lowest p-value and once for the DEGs with highest log2fFC in absolute value). Default: 5.
+#' @param degsLabelSize Numerical. Size of the labels of the DEGs Default: 3.
 #' @param ggrastr Logical. If TRUE, the points of the volcano plot are drawn with geom_points_rast instead of geom_point. Default: FALSE.
 
-
-volcanoPlot2(org_apc_vs_nownt, log2FC = 1)
 
 volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
                          pval = 0.05, log2FC = 1.5,
@@ -44,7 +43,7 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
                          labelSize = 7, labelColor = c("darkgreen", "red"), labelPos = 0,
                          xlab = "log2(FC)", ylab = "-log10(pval)", axisLabelSize = 7, axisTextSize = 7, 
                          pointColor = c("darkgreen", "gray", "red"), legendTitle = FALSE, legendPos = "bottom",
-                         degsLabel=F, degsLabelNum=5,
+                         degsLabel=F, degsLabelNum=10, degsLabelSize = 3,
                          ggrastr = F) {
   
   #load packages
@@ -137,14 +136,24 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
     require(ggrepel)
     
     # Organaize and retrieve most upregulated and most downregulated genes
-    df$abs_log2fc <- sqrt(df$log2FoldChange**2)
-    df  <- df %>% dplyr::arrange(abs_log2fc)
-    df2 <- rbind(tail(na.omit(df),degsLabelNum)) %>% as.data.frame()
+    df <- df %>%
+      # Create variable with absolute values of log2FC
+      dplyr::mutate(abs_log2FC = sqrt(df$log2FoldChange**2)) %>%
+      
+      # Arrange by descendent order of absolute values log2FC and ascendent order of padjusted
+      dplyr::arrange(desc(abs_log2FC))
+    
+    # Create a dataframe with the labels of the DEGs with highest abs(log2FC).
+    degs <- head(na.omit(df),degsLabelNum) %>% as.data.frame()
+    
+    # Rearrange the original dataframe by ascendent p-adjusted.
     df  <- df %>% arrange(padj) 
-    df2 <- rbind(df2, head(df, degsLabelNum))
+    
+    # Bind the degs with higest abs(log2FC) and the DEGs with lowest p-adjusted.  
+    degs <- rbind(degs, head(df, degsLabelNum))
     
     # Put labels in the plot
-    p <- p + geom_text_repel(data = df2, mapping = aes(x = log2FoldChange, y = -log10(padj), label = Geneid), size = 5, color = "Black")
+    p <- p + geom_text_repel(data = degs, mapping = aes(x = log2FoldChange, y = -log10(padj), label = Geneid), size = degsLabelSize, color = "Black")
     
   }
   
