@@ -138,23 +138,20 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
     p <- p + theme(legend.title = element_blank())
   }
   
-  # Write names of the most DE genes in terms of absolute value of log2FC
+  # Write names of the most DE genes in terms of lowest adjusted p-value
   if(degsLabel) {
     
     # Load ggrepel
     require(ggrepel)
     
-    # Organaize and retrieve most upregulated and most downregulated genes
+    # Organaize and retrieve lowest p-value genes
     degs <- df %>%
       
       # Filter non significant genes
-      dplyr::filter(DEG!="NS") %>%
-    
-      # Create variable with absolute values of log2FC
-      dplyr::mutate(abs_log2FC = sqrt(log2FoldChange**2)) %>%
+      dplyr::filter(DEG!="NS") %>% %>%
       
-      # Arrange by descendent order of absolute values log2FC and ascendent order of padjusted
-      dplyr::arrange(desc(abs_log2FC))
+      # Arrange by ascendent order of padjusted
+      dplyr::arrange(padj))
     
     # Create a dataframe with the labels of the DEGs with highest abs(log2FC).
     degs <- head(na.omit(degs),degsLabelNum) %>% as.data.frame()

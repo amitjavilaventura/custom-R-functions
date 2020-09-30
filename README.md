@@ -81,7 +81,7 @@ Needs the output of DESeq2 analysis after calling de DEGs in the corresponding c
 
 Takes the points that are outside of the graph limits and draw them as a triangle at the borders.
 
-Optionally: Draws the labels of the DEGs with lower adjusted p-value using `ggrepl`.
+Optionally: Draws the labels of the DEGs with lower adjusted p-value and higher using `ggrepl`.
 
 Optionally: Instead of using `geom_point()`, uses `geom_point_rast()` from `ggrastr`.
 
