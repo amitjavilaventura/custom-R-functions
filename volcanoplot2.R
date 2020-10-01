@@ -151,7 +151,7 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
       dplyr::filter(DEG!="NS") %>%
       
       # Arrange by ascendent order of padjusted
-      dplyr::arrange(padj))
+      dplyr::arrange(padj)
     
     # Create a dataframe with the labels of the DEGs with highest abs(log2FC).
     degs <- head(na.omit(degs),degsLabelNum) %>% as.data.frame()
