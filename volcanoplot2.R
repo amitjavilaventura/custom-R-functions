@@ -148,7 +148,7 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
     degs <- df %>%
       
       # Filter non significant genes
-      dplyr::filter(DEG!="NS") %>% %>%
+      dplyr::filter(DEG!="NS") %>%
       
       # Arrange by ascendent order of padjusted
       dplyr::arrange(padj))
