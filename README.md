@@ -91,3 +91,19 @@ Packages used:
 * `dplyr`
 * `ggrastr` (optional)
 * `ggrepel` (optional)
+
+## `barAnno3.R`
+
+### `barAnno3()`
+
+Function that plots a ggplot2-based bargraph with the distribution of the peaks from a list of annotation objects that come from as output of `annotatePeak()` from `ChIPseeker`.
+
+As input needs a list of annotation objects from `annotatePeak()`
+
+Packages used:
+
+* `dplyr`
+* `purrr`
+* `ggplot2`
+* `ggpubr`
+* `magrittr`
