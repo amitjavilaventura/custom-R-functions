@@ -21,14 +21,15 @@
 #' @param xlab Character of lenght 1. Title of the X axis. Default: NULL
 #' @param palette Character of lenght 1. Color palette used to color the bars through the function `scale_fill_brewer()`. Default: "Set1".
 #' @param legend_position Character of lenght 1. Position of the legend. One of c("none", "bottom", "right", "left," "top"). Default: "right"
-
+#' @param is_anno Logical. If TRUE, takes the 'anno_list' as a list of annotation objects from annotatePeak. If FALSE, takes 'anno_list' as a list of df that have already been formatted (i.e. read from file)
+#' 
 
 barAnno3 <- function(anno_list, names, 
                      main = NULL, 
                      subtitle = NULL,
                      ylab = "Proportion", xlab = NULL,
                      palette = "Set1",
-                     legend_position = "right"){
+                     legend_position = "right", is_anno = T){
   
   # Load packages
   library(dplyr)
@@ -41,8 +42,15 @@ barAnno3 <- function(anno_list, names,
   anno <- list()
   
   # Format promoter annnotation names to take parentheses out for each annotatePeak object in the list
-  for(i in 1:length(anno_list)){
-    anno[[i]] <- sub(" \\(.*\\)", "", anno_list[[i]]@anno$annotation)
+  if(is_anno){
+    for(i in 1:length(anno_list)){
+      anno[[i]] <- sub(" \\(.*\\)", "", anno_list[[i]]@anno$annotation)
+    }
+  }
+  else{
+    for(i in 1:length(anno_list)){
+      anno[[i]] <- sub(" \\(.*\\)", "", anno_list[[i]]$annotation)
+    }
   }
   
   # Set the names of each annotatePeak object in the list with the vector names
@@ -52,14 +60,15 @@ barAnno3 <- function(anno_list, names,
     purrr::map(~as.data.frame(x = .x)) %>%
     
     # Write an extra column to each dataframe with the name of the dataframe (provided in names)
-    purrr::imap(~mutate(.data = .x, sample = .y)) %>% 
-    
-    # Bind dataframes by rows
-    bind_rows() %>% 
+    purrr::imap(~mutate(.data = .x, sample = as.character(.y))) %>% 
     
     # Set column names
-    set_colnames(c("annotation", "sample")) %>%
-    
+    purrr::map(~set_colnames(x = .x, c(c("annotation", "sample")))) %>% 
+    purrr::map(~mutate(.data = .x, annotation = as.character(annotation))) %>%
+  
+    # Bind dataframes by rows
+    bind_rows() %>% 
+
     # Rewrite annotation as distal or gene body depending on the feature 
     dplyr::mutate(annotation = dplyr::recode(annotation,
                                               "Distal Intergenic" = "Distal",
@@ -81,7 +90,7 @@ barAnno3 <- function(anno_list, names,
     # Basic formatting
     theme_pubr() + 
     
-    theme(axis.text.x = element_text(angle = 15, hjust = 1, vjust = 1),
+    theme(axis.text.x = element_text(angle = 20, hjust = 1, vjust = 1),
           legend.title = element_blank(),
           legend.position = legend_position)
   
