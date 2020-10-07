@@ -92,13 +92,16 @@ Packages used:
 * `ggrastr` (optional)
 * `ggrepel` (optional)
 
-## `barAnno3.R`
+## `barAnno.R`
 
-### `barAnno3()`
+### `barAnno()`
 
 Function that plots a ggplot2-based bargraph with the distribution of the peaks from a list of annotation objects that come from as output of `annotatePeak()` from `ChIPseeker`.
 
-As input needs a list of annotation objects from `annotatePeak()`
+As input needs a list of annotation objects from `annotatePeak()`.
+
+It can plot the annoations as "Promoter", "Gene body" (those that are "Intron", "Exon"...) and "Distal" (those that are "Distal intergenic" and "Downstream), 
+or it can plot the annotations as "Promoter" and "Distal" (those that are not "Promoter").
 
 Packages used:
 
