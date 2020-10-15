@@ -16,25 +16,27 @@
 #' @param anno_list List of annotation objects that come from annotatePeak().
 #' @param names Charachter vector of the same length as 'anno_list'. Names that will be given to each of the objects in anno_list. Not that will be the names plotted in the bargraph
 #' @param names_order Character vector with the same entries as 'names' with the order wanted to plot the data.
-#' @param protein Character vector of the same length as 'anno_list' with the protein chipped in each dataframe. Only if is_chip is set to TRUE. Default: NULL.
+#' @param protein Character vector of the same length as 'anno_list' with the protein chipped in each dataframe of anno_list. This names will be passed through `facet_wrap()`. Only works if is_chip is set to TRUE. Default: NULL.
 #' @param main Character of lenght 1. Title of the plot. Default: NULL.
 #' @param subtitle Character of lenght 1. Subtitle of the plot. Default: NULL.
-#' @param ylab Character of lenght 1. Title of the Y axis. Default: "Proportion".
+#' @param ylab Character of lenght 1. Title of the Y axis. Default: NULL.
 #' @param xlab Character of lenght 1. Title of the X axis. Default: NULL
 #' @param palette Character of lenght 1. Color palette used to color the bars through the function `scale_fill_brewer()`. Default: "Set1".
 #' @param legend_position Character of lenght 1. Position of the legend. One of c("none", "bottom", "right", "left," "top"). Default: "right"
-#' @param is_anno Logical. If TRUE, takes the 'anno_list' as a list of annotation objects from annotatePeak. If FALSE, takes 'anno_list' as a list of df that have already been formatted (i.e. read from file)
-#' @param is_chip Logical. If TRUE, it means that the input data comes from a ChiP experiment, which will separate the plot by proteins. It's optional. Default: FALSE.
+#' @param is_anno Logical. If TRUE, takes the 'anno_list' as a list of annotation objects from annotatePeak. If FALSE, takes 'anno_list' as a list of `annotatePeak()` output that have already been formatted to data.frame (i.e. read from file)... this is done because of the behaviour of our snakemake pipeline.
+#' @param is_chip Logical. If TRUE, it means that the input data comes from a ChiP experiment, which will separate the plot by proteins. It can be set to FALSE even if data comes from ChIPseq, but remember that if you want to separate proteins, the names of each protein group must be different. It can be also set to TRUE if data comes from ATACseq, then in 'protein' you can write the desired grouping variable. Default: FALSE.
 #' @param anno_num Integer number. Number of annotations to plot, either 2 (Promoter/Distal) or 3 (Promoter/Gene body/Distal). Default: 3.
+#' @param position_fill Logical. If TRUE (default), it the plotted bars will represent proportion of peaks in each feature. If FALSE, the bars will have the height of the total number of peaks with the correspondent feature color.
 
 barAnno  <- function(anno_list, names, names_order,
                      protein = NULL,
                      main = NULL, 
                      subtitle = NULL,
-                     ylab = "Proportion", xlab = NULL,
+                     ylab = NULL, xlab = NULL,
                      palette = "Set1",
                      legend_position = "right", 
-                     is_anno = F, is_chip = F, anno_num = 3){
+                     is_anno = F, is_chip = F, anno_num = 3,
+                     position_fill = T){
   
   # Load packages
   library(dplyr)
@@ -110,14 +112,23 @@ barAnno  <- function(anno_list, names, names_order,
   }
   
   # Create gglpot2-based barplot
-  if(is_chip){
-    g <- ggplot(anno_df, aes(sample, fill = factor(annotation))) + geom_bar(position = "fill") + facet_wrap(~protein)
+  if(position_fill){
+    if(is_chip){
+      g <- ggplot(anno_df, aes(sample, fill = annotation)) + geom_bar(position = "fill") + facet_wrap(~protein)
+    }
+    else{
+      g <- ggplot(anno_df, aes(sample, fill = annotation)) + geom_bar(position = "fill")
+    }
   }
   
-  else{
-    g <- ggplot(anno_df, aes(sample, fill = factor(annotation))) + geom_bar(position = "fill")
+  else{    
+    if(is_chip){
+      g <- ggplot(anno_df, aes(sample, fill = annotation)) + geom_bar() + facet_wrap(~protein)
+    }
+    else{
+      g <- ggplot(anno_df, aes(sample, fill = annotation)) + geom_bar()
+    }
   }
-  
     # Write plot title, subtitle and axis labels
   g <- g + ggtitle(main, subtitle = subtitle) + ylab(ylab) + xlab(xlab) +
     
@@ -134,4 +145,8 @@ barAnno  <- function(anno_list, names, names_order,
   # Draw plot
   return(g)
 }
-         
+        
+peak_dist <- tfactors %>% keep(str_detect(names(.), "WTr", negate = TRUE))
+
+
+

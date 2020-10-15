@@ -28,6 +28,10 @@ source(here("R/pieAnno2.R"))
 # filterAnno3 -> A function that takes the output of Annotate peak and changes the features to promoter or distal. 
 source(here("R/pieAnno3.R"))
 
+# ----- barAnno ----- #
+# barAnno -> a function to draw barplots from a list of annotatePeak objects. Can divide peaks in promoter/distal or promoter/gene body/distal
+source(here("R/barAnno.R"))
+
 # ----- GOenrichment ----- #
 # A function that does enrichGO
 # Author: dfernandezperez
