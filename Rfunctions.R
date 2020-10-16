@@ -3,7 +3,6 @@
 ######################
 
 # The paths may have to be changed depending on the current working directory
-
 if(!require(here)){ install.packages("here") }; library(here)
 
 # ----- chromReads ----- #
@@ -31,6 +30,10 @@ source(here("R/pieAnno3.R"))
 # ----- barAnno ----- #
 # barAnno -> a function to draw barplots from a list of annotatePeak objects. Can divide peaks in promoter/distal or promoter/gene body/distal
 source(here("R/barAnno.R"))
+
+# ----- vennDiagram2 ----- #
+# vennDiagram2 -> a function to draw venn diagarams from two GenomicRanges objects.
+source(here("R/vennDiagram2.R"))
 
 # ----- GOenrichment ----- #
 # A function that does enrichGO
