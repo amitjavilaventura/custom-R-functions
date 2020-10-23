@@ -19,12 +19,12 @@ source(here("R/volcanoplot2.R"))
 
 # ----- pieAnno2 ----- #
 # pieAnno2 -> A function to draw pie charts with the peaks divided by promoter and distal (all non promoter).
-# filterAnno2 -> A function that takes the output of Annotate peak and changes the features to promoter or distal. 
+# filterAnno2 -> A function that takes the output of Annotate peak and changes the features to promoter or distal.
 source(here("R/pieAnno2.R"))
 
 # ----- pieAnno3 ----- #
 # pieAnno3 -> A function to draw pie charts with the peaks divided by promoter, gene body (UTRs, introns, exons) and distal (distal intergeninc, downstream).
-# filterAnno3 -> A function that takes the output of Annotate peak and changes the features to promoter or distal. 
+# filterAnno3 -> A function that takes the output of Annotate peak and changes the features to promoter or distal.
 source(here("R/pieAnno3.R"))
 
 # ----- barAnno ----- #
@@ -34,6 +34,10 @@ source(here("R/barAnno.R"))
 # ----- vennDiagram2 ----- #
 # vennDiagram2 -> a function to draw venn diagarams from two GenomicRanges objects.
 source(here("R/vennDiagram2.R"))
+
+# ----- read_delim_empty ----- #
+# read_delim_empty -> a read.delim()-based function that can read empty files.
+source(here("R/read_delim_empty.R"))
 
 # ----- GOenrichment ----- #
 # A function that does enrichGO
