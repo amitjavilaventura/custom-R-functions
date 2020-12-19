@@ -26,7 +26,9 @@ read_delim_empty <- function(file, header = F, sep="\t", dec="."){
   info <- file.info(file)
 
   if(info$size == 0){
-    a <- data.frame(0)
+    a <- data.frame(seqnames = "chr1",
+                    start = 0,
+                    end = 1)
     return(a)
   }
   else{
