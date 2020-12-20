@@ -110,3 +110,48 @@ Packages used:
 * `ggplot2`
 * `ggpubr`
 * `magrittr`
+
+## `chromHMM_functions.R`
+
+Functions to visualize `ChromHMM` states data
+
+### `chromHMM_emission2heatmap()`
+
+Function that draws a ggplot2-based heatmap with the feature/mark likelihood in each state.
+
+* **Input**: `emissions_{states}.txt` (where '{states}' is the number of states). Can be read directly from the function or an already read dataframe. 
+* **_Alternative_ input**: if stored in a variable (i.e. `a`), the output of the function can be reused by looking at the field `$data` from the variable (i.e. `a$data`).
+* Dependencies:
+
+  + `dplyr`
+  + `reshape2`
+  + `ggplot2`
+  + `ggpubr`
+  + `magrittr`
+ 
+### `chromHMM_enrich2heatmap()`
+
+Function that draws a ggplot2-based heatmap with the state enrichment in genomic regions.
+
+* **Input**: `{condition}_{states}_overlap.txt` (where '{states}' is the number of states and {condition} is the condition of determined in the input matrix for `chromHMM`). Can be read directly from the function or an already read dataframe. 
+* **_Alternative_ input**: if stored in a variable (i.e. `a`), the output of the function can be reused by looking at the field `$data` from the variable (i.e. `a$data`).
+* Dependencies:
+
+  + `dplyr`
+  + `reshape2`
+  + `ggplot2`
+  + `ggpubr`
+  + `magrittr`
+
+### `chromHMM_neighbor2heatmap()`
+
+Function that draws a ggplot2-based heatmap with the state enrichment in genomic regions.
+
+* **Input**: `{condition}_{states}_RefSeq{site}_neighborhood.txt` (where '{states}' is the number of states, {condition} is the condition of determined in the input matrix for `chromHMM` and {site} is TSS/TES). Can be read directly from the function or an already read dataframe. 
+* **_Alternative_ input**: if stored in a variable (i.e. `a`), the output of the function can be reused by looking at the field `$data` from the variable (i.e. `a$data`).
+* Dependencies:
+
+  + `tidyverse`
+  + `reshape2`
+  + `ggpubr`
+  + `magrittr`
