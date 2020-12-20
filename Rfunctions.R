@@ -39,6 +39,10 @@ source(here("R/vennDiagram2.R"))
 # read_delim_empty -> a read.delim()-based function that can read empty files.
 source(here("R/read_delim_empty.R"))
 
+# ----- chromHMM functions ----- #
+# read_delim_empty -> a read.delim()-based function that can read empty files.
+source(here("R/chromHMM_functions.R"))
+
 # ----- GOenrichment ----- #
 # A function that does enrichGO
 # Author: dfernandezperez
