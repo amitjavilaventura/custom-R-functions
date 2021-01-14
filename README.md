@@ -1,5 +1,4 @@
-Rfunctions
-==========
+# Rfunctions
 
 R custom functions that are useful for different omics analyses.
 
@@ -7,7 +6,7 @@ R custom functions that are useful for different omics analyses.
 
 Script that loads all the functions by doing source of the other R scripts present in this repository.
 
-It use the R package `here` (if you don't have it, it will probably be installed).
+It use the R package `here` (if you don't have it).
 
 Paths may have to be changed depending on the current directory where `here` works.
 

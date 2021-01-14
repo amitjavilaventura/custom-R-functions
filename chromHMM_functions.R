@@ -4,13 +4,12 @@
 
 # Several functions to help in the visualization of chromHMM outputs
 
-# -------------------------------------------------------------------------------------------------
-# chromHMM_emission2heatmap
-# -------------------------------------------------------------------------------------------------
+# chromHMM_emission2heatmap  ------
+# ----------------------------------------------------------------------------------------------- #
 
 chromHMM_emission2heatmap <- function(df = NULL, file = NULL, df_melt = NULL, features = NULL, states = NULL,
                                       title = "", subtitle = "", xlab = "Features", color = "Tomato",
-                                      label_size = 2){
+                                      label_size = 2, reverse_y = T, plotly = F){
 
   # PACKAGES
   require(dplyr)
@@ -44,23 +43,31 @@ chromHMM_emission2heatmap <- function(df = NULL, file = NULL, df_melt = NULL, fe
     ggtitle(title, subtitle) + ylab("State") + xlab(xlab) +
     theme_pubr() + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1),
                          axis.title = element_text(face = "bold", size = 12),
-                         axis.text = element_text(size = 10))
+                         axis.text = element_text(size = 10),
+                         plot.title = element_text(hjust=.5), plot.subtitle = element_text(hjust=.5))
+
+  # Reverse Y axis
+  if(reverse_y){ g <- g + scale_y_reverse() }
+
+
+  # Plotlify
+  if(plotly){
+    require(plotly)
+    g <- ggplotly(g)
+  }
 
   # Return plot
   return(g)
-
-
 }
 
 
 
-# -------------------------------------------------------------------------------------------------
-# chromHMM_enrich2heatmap
-# -------------------------------------------------------------------------------------------------
+# chromHMM_enrich2heatmap -------
+# ----------------------------------------------------------------------------------------------- #
 
 chromHMM_enrich2heatmap <- function(df = NULL, file = NULL, df_melt = NULL, regions = NULL, states = NULL,
                                     title = "", subtitle = "", color = "Cornflowerblue", scale_color = "scale",
-                                    legend = F, label_size = 2){
+                                    legend = F, label_size = 2, reverse_y = T, plotly = F){
 
   # PACKAGES
   require(dplyr)
@@ -103,17 +110,26 @@ chromHMM_enrich2heatmap <- function(df = NULL, file = NULL, df_melt = NULL, regi
                          axis.title = element_text(face = "bold", size = 12),
                          axis.text = element_text(size = 10))
 
+  # Reverse Y axis
+  if(reverse_y){ g <- g + scale_y_reverse() }
+
+  # Plotlify
+  if(plotly){
+    require(plotly)
+    g <- ggplotly(g)
+  }
+
   # Return plot
   return(g)
 }
 
 
-# -------------------------------------------------------------------------------------------------
-# chromHMM_neighbor2heatmap
-# -------------------------------------------------------------------------------------------------
+# chromHMM_neighbor2heatmap ------
+# ----------------------------------------------------------------------------------------------- #
 chromHMM_neighbor2heatmap <- function(df = NULL, file = NULL, df_melt = NULL, states = NULL,
                                       title = "", subtitle = "", xlab = "Distance to TSS",
-                                      color = "Cornflowerblue", legend = F, label_size = 2){
+                                      color = "Cornflowerblue", legend = F, label_size = 2,
+                                      reverse_y = T, plotly = F){
 
   # PACKAGES
   require(tidyverse)
@@ -155,17 +171,26 @@ chromHMM_neighbor2heatmap <- function(df = NULL, file = NULL, df_melt = NULL, st
     theme_pubr() + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1),
                          axis.title = element_text(face = "bold", size = 12),
                          axis.text = element_text(size = 10))
+  # Reverse Y axis
+  if(reverse_y){ g <- g + scale_y_reverse() }
+
+  # Plotlify
+  if(plotly){
+    require(plotly)
+    g <- ggplotly(g)
+  }
+
   # Return plot
   return(g)
 }
 
 
-# -------------------------------------------------------------------------------------------------
-# chromHMM_states2barplot
-# -------------------------------------------------------------------------------------------------
+# chromHMM_states2barplot ------
+# ----------------------------------------------------------------------------------------------- #
 
 chromHMM_states2barplot <-  function(df = NULL, file = NULL, df_processed = NULL, states = NULL,
-                                     title = "", subtitle = "", color = c("Cornflowerblue", "Darkblue"), scale_color = ""){
+                                     title = "", subtitle = "", color = c("Cornflowerblue", "Darkblue"), scale_color = "",
+                                     plotly = F){
 
   # PACKAGES
   require(dplyr)
@@ -207,7 +232,7 @@ chromHMM_states2barplot <-  function(df = NULL, file = NULL, df_processed = NULL
   }
   else{
     g <- ggplot(df2, aes(state, bases, fill = state)) + geom_col(show.legend = F)
-    }
+  }
 
 
   g <- g + coord_flip() + scale_y_continuous(expand = expansion(mult = c(0.01, 0.1))) +
@@ -216,6 +241,11 @@ chromHMM_states2barplot <-  function(df = NULL, file = NULL, df_processed = NULL
                          axis.title = element_text(face = "bold", size = 14),
                          legend.position = "right")
 
+  # Plotlify
+  if(plotly){
+    require(plotly)
+    g <- ggplotly(g)
+  }
 
   # Return plot
   return(g)

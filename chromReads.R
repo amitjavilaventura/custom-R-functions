@@ -1,6 +1,5 @@
-###############
-# CHROM READS #
-###############
+### chromReads()
+### ===============================================================================================
 
 #' @title chromReads
 #' @author amitjavilaventura
@@ -21,10 +20,11 @@
 #' @param xlab Character. Title of the X axis. Default: "Mapped reads".
 #' @param ylab Character. Title of the Y axis. Default: "Chromosome".
 #' @param legend Logical. If TRUE, legend is plotted. Default: FALSE.
+#' @param plotly Logical. If TRUE, the ggplot object will be passed to 'ggplotlify()' to transform it to an interactive plotly graph.
 #'
 chromReads <- function(bamfile, text.size = 8, main = NULL, main.size = 13, subtitle = NULL, sub.size = 11,
                        axis.x = T, axis.y = T, xlab = "Mapped reads", ylab = "Chromosome", x.size = 9, y.size = 9,
-                       legend = F, percent = T, genome = "mouse" , lab.size = 3){
+                       legend = F, percent = T, genome = "mouse" , lab.size = 3, plotly = F){
 
   # Load required packages
   require(Rsamtools)
@@ -115,8 +115,13 @@ chromReads <- function(bamfile, text.size = 8, main = NULL, main.size = 13, subt
     b <- b + theme(legend.title = element_blank())
   }
 
+  if(plotly == T){
+    require(plotly)
+    b <- ggplotly(b)
+  }
+
   # Return bar graph
-  b
+  return(b)
 
 }
 
