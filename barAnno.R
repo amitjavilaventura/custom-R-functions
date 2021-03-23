@@ -38,7 +38,7 @@ barAnno  <- function(anno_list,
                      palette = "Set1",
                      legend_position = "right",
                      is_anno = F, facet = F, anno_num = 3,
-                     position_fill = T, plotly = F){
+                     position_fill = T){
 
   # Load packages
   library(dplyr)
@@ -49,11 +49,12 @@ barAnno  <- function(anno_list,
 
   if(facet & is.null(protein)){
     message1 <- "If 'facet' is TRUE, the argument 'protein' must be specified."
-    message2 <- "The argument 'protein' must be a character vector of the same length as 'names', such as the proteins chipped in each sample or other grouping variables passed to 'facet_wrap()'"
+    message2 <- "The argument 'protein' must be a character vector of the same length as 'names',
+    such as the proteins chipped in each sample or other grouping variables passed to 'facet_wrap()'"
     stop(paste("Error.", message1, message2, sep = " "))
   }
   else{
-    if(!is.null(anno_list) & is.null(anno_df)){
+    if(!is.null(anno_list)){
 
       # Create list for annotations from the list of annotatePeak object provided as input
       anno <- list()
@@ -75,7 +76,7 @@ barAnno  <- function(anno_list,
       anno_df <- set_names(x = anno, nm = names) %>%
 
         # Convert the annotatePeak objects to dataframe
-        purrr::map(~as.data.frame(x = .x)) %>%
+        purrr::map(~as_tibble(x = .x)) %>%
 
         # Write an extra column to each dataframe with the name of the dataframe (provided in names)
         purrr::imap(~mutate(.data = .x, sample = as.character(.y))) %>%
@@ -84,7 +85,7 @@ barAnno  <- function(anno_list,
         purrr::map(~set_colnames(x = .x, c(c("annotation", "sample")))) %>%
         purrr::map(~dplyr::mutate(.data = .x, annotation = as.character(annotation)))
 
-      if(is_chip){
+      if(facet){
         anno_df <- set_names(x = anno_df, nm = protein) %>%
 
           # Write an extra column to each dataframe with the name of the dataframe (provided in names)
@@ -146,12 +147,6 @@ barAnno  <- function(anno_list,
     # Basic formatting
     theme_pubr(legend = legend_position, x.text.angle = 20) +
     theme(legend.title = element_blank())
-
-  # Plotlify
-  if(plotly == T){
-    require(plotly)
-    g <- ggplotly(g)
-  }
 
   # Return plot
   return(g)

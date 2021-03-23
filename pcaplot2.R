@@ -50,8 +50,8 @@ pcaplot2 <- function(x, title = NULL, pcX = 1, pcY = 2, text_labels = TRUE, lege
 
   g <- ggplot(data = x, aes_string(x = paste0("PC",pcX), y = paste0("PC",pcY), color = "group")) +
     geom_point(size = point_size, shape = point_shape) +
-    xlab(paste0("PC",pcX,": ", round(percentVar[pcX] * 100,digits = 2), "% variance")) +
-    ylab(paste0("PC",pcY,": ", round(percentVar[pcY] * 100,digits = 2), "% variance"))
+    xlab(paste0("PC",pcX)) +
+    ylab(paste0("PC",pcY))
 
   ## plot confidence ellipse
   # credit to vince vu, author of ggbiplot
