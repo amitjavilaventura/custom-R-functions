@@ -20,16 +20,17 @@
 #' @param xlab Character. Title of the X axis. Default: "Mapped reads".
 #' @param ylab Character. Title of the Y axis. Default: "Chromosome".
 #' @param legend Logical. If TRUE, legend is plotted. Default: FALSE.
-#' @param plotly Logical. If TRUE, the ggplot object will be passed to 'ggplotlify()' to transform it to an interactive plotly graph.
+#' @param chr.filt Character. Vector of undefined length with strings to filter chromosomes (i.e. "Un" would filter all chromosomes containing "Un" in their name). Default: c("Un", "random").
 #'
 chromReads <- function(bamfile, text.size = 8, main = NULL, main.size = 13, subtitle = NULL, sub.size = 11,
                        axis.x = T, axis.y = T, xlab = "Mapped reads", ylab = "Chromosome", x.size = 9, y.size = 9,
-                       legend = F, percent = T, genome = "mouse" , lab.size = 3, plotly = F){
+                       legend = F, percent = T, genome = "mouse" , lab.size = 3, chr.filt = c("Un", "random")){
 
   # Load required packages
   require(Rsamtools)
   require(ggplot2)
   require(dplyr)
+  require(stringr)
 
   # Calculate the number of reads mapping to each chromosome with Rsamtools::idxstatsBam()
   chromReads <- idxstatsBam(bamfile)
@@ -42,6 +43,12 @@ chromReads <- function(bamfile, text.size = 8, main = NULL, main.size = 13, subt
 
   # Calculate percentage of mapped reads in each chromosome against all mapped reads
   chromReads$percentage <- chromReads$mapped/totalReads*100
+
+  # filter strange genes
+  for(i in chr.filt){
+    chromReads <- chromReads[(str_detect(chromReads$seqnames, pattern = i, negate = T)),]
+  }
+
 
   # Draw a bar graph
   b <- ggplot(data = chromReads, mapping = aes(seqnames, mapped, fill = seqnames)) +
@@ -83,6 +90,34 @@ chromReads <- function(bamfile, text.size = 8, main = NULL, main.size = 13, subt
       annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chrY"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chrY"]+100000, x = 21, hjust = 0, size = lab.size, color = "grey30") +
       annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chrM"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chrM"]+100000, x = 22, hjust = 0, size = lab.size, color = "grey30")
   }
+  else if(percent == T & genome == "human"){
+    b <- b +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr1"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr1"]+100000, x = 1, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr2"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr2"]+100000, x = 2, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr3"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr3"]+100000, x = 3, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr4"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr4"]+100000, x = 4, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr5"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr5"]+100000, x = 5, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr6"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr6"]+100000, x = 6, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr7"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr7"]+100000, x = 7, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr8"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr8"]+100000, x = 8, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr9"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr9"]+100000, x = 9, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr10"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr10"]+100000, x = 10, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr11"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr11"]+100000, x = 11, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr12"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr12"]+100000, x = 12, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr13"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr13"]+100000, x = 13, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr14"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr14"]+100000, x = 14, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr15"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr15"]+100000, x = 15, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr16"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr16"]+100000, x = 16, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr17"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr17"]+100000, x = 17, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr18"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr18"]+100000, x = 18, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr19"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr19"]+100000, x = 19, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr20"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr20"]+100000, x = 20, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr21"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr21"]+100000, x = 21, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chr22"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chr22"]+100000, x = 22, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chrX"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chrX"]+100000, x = 23, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chrY"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chrY"]+100000, x = 24, hjust = 0, size = lab.size, color = "grey30") +
+      annotate("text", label = paste(round(chromReads$percentage[chromReads$seqnames == "chrM"], 2), "%"), y = chromReads$mapped[chromReads$seqnames == "chrM"]+100000, x = 25, hjust = 0, size = lab.size, color = "grey30")
+  }
 
   # Formatting title and subtitle
   if(!is.null(main)){
@@ -115,10 +150,6 @@ chromReads <- function(bamfile, text.size = 8, main = NULL, main.size = 13, subt
     b <- b + theme(legend.title = element_blank())
   }
 
-  if(plotly == T){
-    require(plotly)
-    b <- ggplotly(b)
-  }
 
   # Return bar graph
   return(b)
