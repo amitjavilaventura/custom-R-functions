@@ -27,7 +27,7 @@
 #' @param facet Logical. If TRUE, the plot will be separated by the groups set in proteins. It can be set to FALSE even if data comes from ChIPseq, but remember that if you want to separate proteins, the names of each protein group must be different. It can be also set to TRUE if data comes from ATACseq, then in 'protein' you can write the desired grouping variable. Default: FALSE.
 #' @param anno_num Integer number. Number of annotations to plot, either 2 (Promoter/Distal) or 3 (Promoter/Gene body/Distal). Default: 3.
 #' @param position_fill Logical. If TRUE (default), it the plotted bars will represent proportion of peaks in each feature. If FALSE, the bars will have the height of the total number of peaks with the correspondent feature color.
-#' @param plotly Logical. If TRUE, the ggplot object will be passed to 'ggplotlify()' to transform it to an interactive plotly graph.
+#' @param xangle Integer number. Angle of the text in the X axis
 
 barAnno  <- function(anno_list,
                      names, names_order = NULL,
@@ -38,7 +38,8 @@ barAnno  <- function(anno_list,
                      palette = "Set1",
                      legend_position = "right",
                      is_anno = F, facet = F, anno_num = 3,
-                     position_fill = T){
+                     position_fill = T,
+                     xangle = 20){
 
   # Load packages
   library(dplyr)
@@ -145,7 +146,7 @@ barAnno  <- function(anno_list,
     scale_fill_brewer(palette = palette) +
 
     # Basic formatting
-    theme_pubr(legend = legend_position, x.text.angle = 20) +
+    theme_pubr(legend = legend_position, x.text.angle = xaxis) +
     theme(legend.title = element_blank())
 
   # Return plot
