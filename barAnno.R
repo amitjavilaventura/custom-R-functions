@@ -146,7 +146,7 @@ barAnno  <- function(anno_list,
     scale_fill_brewer(palette = palette) +
 
     # Basic formatting
-    theme_pubr(legend = legend_position, x.text.angle = xaxis) +
+    theme_pubr(legend = legend_position, x.text.angle = xangle) +
     theme(legend.title = element_blank())
 
   # Return plot
