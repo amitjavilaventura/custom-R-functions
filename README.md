@@ -56,11 +56,11 @@ Packages used:
 
 It includes two functions:
 	
-### `filterAnno3`
+### `filterAnno3()`
 
 Takes the output of �`annotatePeak and changes the annotation features to "Promoter", "Gene body" or "Distal". 
 
-### `pieAnno3`
+### `pieAnno3()`
 
 Takes the output of `annotaePeak`, calls `filterAnno3` and plots a ggplot2-based pie chart with only distal, promoter and gene body regions. 
 
@@ -70,7 +70,7 @@ Packages used:
 
 ## `volcanoplot2.R`
 
-### `volcanoPlot2`
+### `volcanoPlot2()`
 
 Modification of a function made by dfernandezperez in his RNAseq_snakemake pipeline.
 
@@ -93,7 +93,7 @@ Packages used:
 
 ## `barAnno.R`
 
-### `barAnno()`
+### `barAnno()`
 
 Function that plots a ggplot2-based bargraph with the distribution of the peaks from a list of annotation objects that come from as output of `annotatePeak()` from `ChIPseeker`.
 
@@ -112,9 +112,9 @@ Packages used:
 
 ## `chromHMM_functions.R`
 
-Functions to visualize `ChromHMM` states data
+Functions to visualize `ChromHMM` states data. Already in the [`chromHMMviewR` package](https://github.com/amitjavilaventura/chromHMMviewR).
 
-### `chromHMM_emission2heatmap()`
+### `chromHMM_emission2heatmap()`
 
 Function that draws a ggplot2-based heatmap with the feature/mark likelihood in each state.
 
@@ -128,7 +128,7 @@ Function that draws a ggplot2-based heatmap with the feature/mark likelihood in 
   + `ggpubr`
   + `magrittr`
  
-### `chromHMM_enrich2heatmap()`
+### `chromHMM_enrich2heatmap()`
 
 Function that draws a ggplot2-based heatmap with the state enrichment in genomic regions.
 
@@ -142,7 +142,7 @@ Function that draws a ggplot2-based heatmap with the state enrichment in genomic
   + `ggpubr`
   + `magrittr`
 
-### `chromHMM_neighbor2heatmap()`
+### `chromHMM_neighbor2heatmap()`
 
 Function that draws a ggplot2-based heatmap with the state enrichment in genomic regions.
 
