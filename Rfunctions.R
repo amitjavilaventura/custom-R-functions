@@ -55,3 +55,43 @@ goEnrichment <- function(df, ont = "BP", db = org.Mm.eg.db) {
                   readable = TRUE)
   return(ego)
 }
+
+
+# ----- peakAnno ----- #
+# A function that does annotatePeak
+# Author: dfernandezperez
+peakAnno <- function(infile, tssRegion = c(-2500, 2500), TxDb, annoDb) {
+
+  # Load packages and set parameters
+  require(ChIPseeker)
+  require(TxDb, character.only = T)
+  require(annoDb, character.only = T)
+
+  # read file and annotate peaks
+  peak <- infile %>% as_granges()
+  annot <- annotatePeak(peak = peak, TxDb = get(TxDb), annoDb = annoDb, tssRegion = tssRegion)
+
+  # The program classifies promotres in 1kb, 2kb... this line removes that annotation and leaves just "Promoters"
+  annot@anno$annotation <- sub(" \\(.*\\)", "", annot@anno$annotation)
+
+  # The program changes the type of object, so go back to GRanges (useful for downstream analysis)
+  final <- as.GRanges(annot)
+  return(final)
+}
+
+
+# ----- chip_stats ----- #
+# funtion that makes a table from a list of df with peak annotation
+chip_stats <- function(df, conditions = NULL){
+
+  require(dplyr)
+
+  if(is.null(conditions)){conditions <- names(df)}
+
+  stats <- tibble(Condition = conditions,
+                  Peaks     = df %>% purrr::map_dbl(nrow),
+                  Targets   = df %>% purrr::map(~dplyr::select(.data = .x, SYMBOL)) %>% purrr::map(~unique(x = .x)) %>%  purrr::map_dbl(nrow))
+
+  return(stats)
+
+}
