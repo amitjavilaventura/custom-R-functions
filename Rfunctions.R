@@ -35,6 +35,10 @@ source(here("R/vennDiagram2.R"))
 # read_delim_empty -> a read.delim()-based function that can read empty files.
 source(here("R/read_delim_empty.R"))
 
+# ----- read_delim_empty ----- #
+# read_delim_empty -> a read.delim()-based function that can read empty files.
+source(here("R/def_enhancers.R"))
+
 # ----- chromHMM functions ----- #
 # already in the chromHMMviewR package
 #source(here("R/chromHMM_functions.R"))
