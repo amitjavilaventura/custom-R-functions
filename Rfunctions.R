@@ -35,13 +35,23 @@ source(here("R/vennDiagram2.R"))
 # read_delim_empty -> a read.delim()-based function that can read empty files.
 source(here("R/read_delim_empty.R"))
 
-# ----- read_delim_empty ----- #
-# read_delim_empty -> a read.delim()-based function that can read empty files.
+# ----- def_enhancers ----- #
+# def_enhancers
+# def_enhancers_no_k4me3
 source(here("R/def_enhancers.R"))
+
+# ----- DEcompare ----- #
+# DEcompare
+source(here("R/DEcompare.R"))
 
 # ----- chromHMM functions ----- #
 # already in the chromHMMviewR package
 #source(here("R/chromHMM_functions.R"))
+
+
+
+
+
 
 # ----- GOenrichment ----- #
 # A function that does enrichGO

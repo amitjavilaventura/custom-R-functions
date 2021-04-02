@@ -41,10 +41,10 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
                          pval = 0.05, log2FC = 1.5,
                          main = NULL, mainSize = 9, sub = NULL, subSize = 8,
                          labelSize = 7, labelColor = c("darkgreen", "red"), labelPos = 0,
-                         xlab = bquote(~Log[2]~ "FC"), ylab = (bquote(~-Log[10]~italic(P))) , axisLabelSize = 7, axisTextSize = 7,
+                         xlab = bquote(~Log[2]~ "FC"), ylab = (bquote(~-Log[10]~italic(P))) , axisLabelSize = 10, axisTextSize = 9,
                          pointColor = c("darkgreen", "gray", "red"), legendTitle = FALSE, legendPos = "bottom",
                          degsLabel = F , degsLabelNum=5, degsLabelSize = 3,
-                         ggrastr = F, plotly = F) {
+                         ggrastr = F) {
 
   #load packages
   require(ggplot2)
@@ -94,9 +94,9 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
   # Annotate the number of up and downregulated DEGs
   p <- p +
     annotate("text", label = sum(df$DEG == "Upregulated"), color = labelColor[2], y = labelPos, x = xlim[2],
-             vjust=0.5,hjust="inward", size = labelSize) +
+             vjust=0.3,hjust="inward", size = labelSize) +
     annotate("text", label = sum(df$DEG == "Downregulated"), color = labelColor[1], y = labelPos, x = xlim[1],
-             vjust=0.5,hjust="inward", size = labelSize)
+             vjust=0.3,hjust="inward", size = labelSize)
 
   # Basic formatting
   p <- p +
@@ -158,11 +158,6 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
 
     # Put labels in the plot
     p <- p + geom_text_repel(data = degs, mapping = aes(x = log2FoldChange, y = -log10(padj), label = Geneid), size = degsLabelSize, color = "Black")
-  }
-
-  if(plotly == T){
-    require(plotly)
-    p <- ggplotly(p)
   }
 
   # Draw the graph.
