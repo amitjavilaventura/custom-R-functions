@@ -95,6 +95,7 @@ peakAnno <- function(infile, tssRegion = c(-2500, 2500), TxDb, annoDb) {
 
 
 # ----- chip_stats ----- #
+# author: amitjavilaventura
 # funtion that makes a table from a list of df with peak annotation
 chip_stats <- function(df, conditions = NULL){
 
@@ -107,5 +108,41 @@ chip_stats <- function(df, conditions = NULL){
                   Targets   = df %>% purrr::map(~dplyr::select(.data = .x, SYMBOL)) %>% purrr::map(~unique(x = .x)) %>%  purrr::map_dbl(nrow))
 
   return(stats)
+
+}
+
+# ----- overlap_peaks ----- #
+# author: amitjavilaventura
+# funtion that overlaps two sets of peaks and returns common and unique peaks (uses plyranges filter_by_overlaps and filter_by_non_overlaps)
+overlap_peaks <- function(peaks1, peaks2, names = c("Peaks1", "Peaks2"),
+                          write_files = F, out_dir = "", out_format = ".tsv", colnames = T){
+
+  require(dplyr)
+  require(plyranges)
+
+  common <- filter_by_overlaps(x = peaks1 %>% as_granges(), y = peaks2 %>% as_granges()) %>%
+    as.data.frame()
+
+  peaks1 <- filter_by_non_overlaps(x = peaks1 %>% as_granges(), y = peaks2 %>% as_granges()) %>%
+    as.data.frame()
+
+  peaks2 <- filter_by_non_overlaps(x = peaks2 %>% as_granges(), y = peaks1 %>% as_granges()) %>%
+    as.data.frame()
+
+  list <- list("common" = common,
+               "peaks1" = peaks1,
+               "peaks2" = peaks2)
+
+  if(write_files){
+
+    dir.create(path = out_dir, showWarnings = F, recursive = T)
+
+    write.table(x = list[["common"]], file = paste(out_dir, "/", paste(names[1], names[2], "common", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
+    write.table(x = list[["peaks1"]], file = paste(out_dir, "/", paste(names[1], "unique", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
+    write.table(x = list[["peaks2"]], file = paste(out_dir, "/", paste(names[2], "unique", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
+
+  } else{
+    return(list)
+  }
 
 }
