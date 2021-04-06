@@ -123,15 +123,15 @@ overlap_peaks <- function(peaks1, peaks2, names = c("Peaks1", "Peaks2"),
   common <- filter_by_overlaps(x = peaks1 %>% as_granges(), y = peaks2 %>% as_granges()) %>%
     as.data.frame()
 
-  peaks1 <- filter_by_non_overlaps(x = peaks1 %>% as_granges(), y = peaks2 %>% as_granges()) %>%
+  peaks1_unique <- filter_by_non_overlaps(x = peaks1 %>% as_granges(), y = peaks2 %>% as_granges()) %>%
     as.data.frame()
 
-  peaks2 <- filter_by_non_overlaps(x = peaks2 %>% as_granges(), y = peaks1 %>% as_granges()) %>%
+  peaks2_unique <- filter_by_non_overlaps(x = peaks2 %>% as_granges(), y = peaks1 %>% as_granges()) %>%
     as.data.frame()
 
   list <- list("common" = common,
-               "peaks1" = peaks1,
-               "peaks2" = peaks2)
+               "peaks1" = peaks1_unique,
+               "peaks2" = peaks2_unique)
 
   if(write_files){
 
