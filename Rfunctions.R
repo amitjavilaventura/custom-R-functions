@@ -44,6 +44,11 @@ source(here("R/def_enhancers.R"))
 # DEcompare
 source(here("R/DEcompare.R"))
 
+
+# ----- Signals in regions ----- #
+# function(s) that take a bigwig(s) and a bed(s) and compute the signal in the desired regions
+source(here("R/signals_in_regions.R"))
+
 # ----- chromHMM functions ----- #
 # already in the chromHMMviewR package
 #source(here("R/chromHMM_functions.R"))
