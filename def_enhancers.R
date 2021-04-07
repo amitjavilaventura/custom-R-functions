@@ -340,7 +340,7 @@ def_enhancers_k4me3_signal <- function(k4me1_distal, k27ac_distal, k27me3_distal
     name   <- conditions[i]
 
     k4me1_distal_filt <- plyranges::filter_by_non_overlaps(x = k4me1_distal %>% bind_rows() %>% dplyr::filter(condition == name) %>% as_granges(),
-                                                           y = k4me3_distal_filt_list %>% bind_rows() %>% dplyr::filter(condition == name) %>% as_granges())
+                                                           y = k4me3_distal_out_list %>% bind_rows() %>% dplyr::filter(condition == name) %>% as_granges())
 
     k4me1_distal_filt_list[[name]] <- k4me1_distal_filt %>% as_tibble()
 
