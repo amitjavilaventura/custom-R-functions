@@ -115,7 +115,7 @@ def_enhancers  <- function(k4me1, k27ac, k27me3 = NULL, conditions){
 
 
 
-### def_enhancers_no_k4me3() DOES NOT WORK
+### def_enhancers_no_k4me3()
 ### ===============================================================================================
 
 #' @title def_enhancers_no_k4me3
@@ -246,8 +246,37 @@ def_enhancers_no_k4me3  <- function(k4me1, k27ac, k4me3, k27me3 = NULL, conditio
 }
 
 
+### def_enhancers_k4me3_signal() DOES NOT WORK
+### ===============================================================================================
+
+# function that filters the enhancers by the signal of k4me3, that should be lower in enhancers than in promoters
+
+def_enhancers_k4me3_signal <- function(k4me1_distal, k27ac_distal, k27me3_distal = NULL, conditions,
+                                       k4me3_peaks, k4me3_bw, operation = "mean") {
+
+  # load packages
+  require(dplyr)
+  require(megadepth)
 
 
+  k4me3_anno <- k4me3_peaks
 
+  for (i in 1:length(conditions)) {
+
+    k4me3_peak_cond <- k4me3_anno[str_detect(names(k4me3_anno), conditions[1])]
+    k4me3_bw_cond   <- k4me3_bw[str_detect(k4me3_bw, conditions[1])]
+
+    k4me3_coverage  <- get_coverage(bigwig_file = k4me3_bw_cond, annotation = k4me3_peak_cond, op = operation)
+  }
+
+  if(!is.null(k27me3)){
+
+    # define empty lists
+    active_enhancers <- list()
+    poised_enhancers <- list()
+    primed_enhancers <- list()
+
+  }
+}
 
 
