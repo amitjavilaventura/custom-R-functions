@@ -324,7 +324,7 @@ def_enhancers_k4me3_signal <- function(k4me1_distal, k27ac_distal, k27me3_distal
     } # end of if/else (k4me3 filtering out)
 
     # append each k4me3_distal_filt to the list
-    k4me3_distal_filt_list[[conditions[i]]] <- k4me3_distal_out %>% mutate(condition = conditions[i])
+    k4me3_distal_out_list[[conditions[i]]] <- k4me3_distal_out %>% mutate(condition = conditions[i])
 
   } # end of loop for
 
