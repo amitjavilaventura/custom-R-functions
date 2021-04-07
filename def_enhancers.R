@@ -292,8 +292,8 @@ def_enhancers_k4me3_signal <- function(k4me1_distal, k27ac_distal, k27me3_distal
     k4me3_bw     <- k4me3_bws[str_detect(k4me3_bws, conditions[i])]
 
     # compute coverage in distal and promo peaks
-    k4me3_coverage_distal <- get_coverage(bigwig_file = k4me3_bw_cond, annotation = k4me3_distal, op = coverage_op)
-    k4me3_coverage_promo  <- get_coverage(bigwig_file = k4me3_bw_cond, annotation = k4me3_promo, op = coverage_op)
+    k4me3_coverage_distal <- get_coverage(bigwig_file = k4me3_bw, annotation = k4me3_distal, op = coverage_op)
+    k4me3_coverage_promo  <- get_coverage(bigwig_file = k4me3_bw, annotation = k4me3_promo, op = coverage_op)
 
     # filter distal peaks and retain those
     # distal peaks with higher score than median score in promo peaks
@@ -394,7 +394,7 @@ def_enhancers_k4me3_signal <- function(k4me1_distal, k27ac_distal, k27me3_distal
   }
 
   # OVERLAP THE MODS IN EACH CONDITION TO DEFINE ACTIVE AND PRIMED ENHANCERS (k27me3_distal IS null)
-  # =========================================================================================================
+  # ================================================================================================
   else {
 
     # define empty lists
