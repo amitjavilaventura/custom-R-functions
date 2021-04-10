@@ -41,13 +41,17 @@ source(here("R/read_delim_empty.R"))
 source(here("R/def_enhancers.R"))
 
 # ----- DEcompare ----- #
-# DEcompare
+# DEcompare() -> compares log2FC of two different differential expression datasets (output from dfernandezperez's RNAseq pipeline)
 source(here("R/DEcompare.R"))
 
 
 # ----- Signals in regions ----- #
 # function(s) that take a bigwig(s) and a bed(s) and compute the signal in the desired regions
 source(here("R/signals_in_regions.R"))
+
+# ----- Upset overlap peaks ----- # --> DOES NOT WORK WELL --> TRY WITH FIND OVERLAPS OF PEAKS
+# upset_overlap_peaks() --> computes the overlaps with different sets of peaks using plyranges and draws a UpSet plot using UpSetR
+source(here("R/upset_overlap_peaks.R"))
 
 # ----- chromHMM functions ----- #
 # already in the chromHMMviewR package

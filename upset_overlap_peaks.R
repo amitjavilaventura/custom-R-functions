@@ -2,7 +2,50 @@
 ## Upset plot for overlapping peaks ##
 ######################################
 
-# upset_overlap_peaks() ---------------------------
+makeVenn4upSet <- function(peaks, conds = names(peaks), conds_order = conds){
+
+  require(purrr)
+  require(dplyr)
+  require(magrittr)
+  require(ChIPpeakAnno)
+  require(pkgcond)
+
+  if(is.null(conds)) { stop("'conds' must not be NULL")}
+
+  len <- length(peaks)
+
+  overlaps <- peaks[conds_order] %>%
+    purrr::map(~as_granges(.x)) %>%
+    makeVennDiagram(plot = F) %>%
+    suppress_messages() %>% suppress_warnings()
+
+  overlaps <- overlaps$vennCounts
+
+  matrix <- matrix(data = rep(0, len), ncol = len, byrow=T) %>% set_colnames(conds_order)
+  for(row in 1:nrow(overlaps)){
+
+    counts <- overlaps[row, len+1]
+
+    m <- matrix(rep(overlaps[row, 1:len], counts), ncol = len, byrow = T)
+
+    matrix <- rbind(matrix, m)
+
+  }
+
+    x <- matrix %>%
+      na.omit %>%
+      as.data.frame() %>%
+      dplyr::mutate(rowSum = rowSums(.)) %>%
+      dplyr::filter(rowSum != 0) %>%
+      dplyr::mutate(peak = paste("peak", 1:nrow(.), sep = "")) %>%
+      dplyr::select(peak, everything(), -rowSum)
+
+    return(list("matrix" = x, "vennCounts" = overlaps))
+
+}
+
+
+# upset_overlap_peaks() -------------------------
 
 #' @title upset_overlap_peaks
 #' @author amitjavilaventura
@@ -12,33 +55,46 @@
 #'
 #' @usage upset_overlap_peaks(peaks, names = names(peaks), names_order = names)
 #'
-#' Takes a list of dataframes with regions.
-#' Merges these dataframes to one dataframe with non-redundant regions.
-#' Add new columns for each condition of the input list and writes a 1 if the peak is present in the corresponding condition.
-#'
 #' @param peaks List of dataframes with the genomic coordinates of the regions to overlap. Dataframes must contain the columns seqnames, start, end.
-#' @param names Character with the same length as the 'peaks' list. The names that are given to the diferente objects in the 'peaks' list. Default: 'names(peaks)'
-#' @param names_order Character of the same length as 'names'. Same values as in 'names' but with the desired order of priority. Default: 'names'
-#' @param draw_plot Logical of length 1. If TRUE, the plot will be returned, if FALSE a dataframe of all the peaks with the conditions where that peak is found will be returned. Default: TRUE
-#' @param ... Arguments to be passed through 'UpSetR::upset()'.
+#' @param conds Character with the same length as the 'peaks' list. The names that are given to the diferente objects in the 'peaks' list. Default: 'names(peaks)'
+#' @param conds_order Character of the same length as 'conds'. Same values as in 'conds' but with the desired order of priority. Default: 'conds'
+#' @param order.by Same as in UpSetR::upset(). One of "freq", "degree" or both.
+#' @param ... Further arguments to be passed through 'UpSetR::upset()'.
+
+upsetOverlapPeaks <- function(peaks, conds = names(peaks), conds_order = conds, order.by = "freq", ...){
+
+  require(UpSetR)
+
+  x <- makeVenn4upSet(peaks, conds, conds_order)
+
+  upset <- UpSetR::upset(data = x$matrix, order.by = "freq", ...)
+
+  return(upset)
+}
 
 
-upset_overlap_peaks <- function(peaks, names = names(peaks), names_order = names, draw_plot = T, ...){
+### THIS FUNCTION DOES NOT WORK WELL, LOOK AT OTHER WAY TO COMPUTE THE OVERLAPS BECAUSE THIS WAY THERE ARE MANY MORE PEAKS THAN THE SUM.
+### IT WORKS WITH PLYRANGES SO IT'S EXTREMELY FAST, BUT GIVES MORE PEAKS THAN EXPECTED.
+### THE LIST OF PEAKS IS OK, BUT IN SOME CONDITIONS, EXCEPT THE FIRST 1 IN CONDS_ORDER, THERE ARE MORE OVERLAPS THAN PEAKS.
+### ALTERNATIVE IS ChIPpeakAnno::findOverlapsOfPeaks or ChIPpeakAnno::makeVennDiagram, BUT THEY ARE SLOW (makeVennDiagram is less slow)
+### KEEP TRYING WITH PLYRANGES.
+### JUST SEEN THAT COMPLEX HEATMAP CAN DO THE OVERLAP OF GENOMIC REGIONS AND THE UPSET PLOT ... :-I
+### COMPLEXHEATMAP::UPSET HAS MANY MORE OVERLAPS.
+overlap4upset <- function(peaks, conds = names(peaks), conds_order = conds){
 
   require(purrr)
   require(dplyr)
   require(tidyr)
   require(magrittr)
   require(plyranges)
-  require(UpSetR)
 
-  if(is.null(names)) { stop("'names' must not be NULL")}
+  if(is.null(conds)) { stop("'conds' must not be NULL")}
 
   len <- length(peaks)
 
-  peaks <- peaks[names_order] %>%
+  peaks <- peaks[conds_order] %>%
     purrr::map(~dplyr::select(.data = .x, seqnames, start, end)) %>%
-    purrr::set_names(nm = names) %>%
+    purrr::set_names(nm = conds) %>%
     purrr::map(~dplyr::mutate(.data = .x, condition = 1)) %>%
     purrr::imap(~set_colnames(x = .x, c("seqnames", "start", "end", .y))) %>%
     purrr::map(~as_granges(.x))
@@ -62,21 +118,7 @@ upset_overlap_peaks <- function(peaks, names = names(peaks), names_order = names
       join_overlap_left(peaks[[i]])
   }
 
-  if(!draw_plot){
-    x <- x %>% as.data.frame() %>% replace(is.na(.), 0) %>% select(-strand, -width) %>% unique()
-    return(x)
-  }
-  else{
+  x <- x %>% as.data.frame() %>% replace(is.na(.), 0) %>% select(-strand, -width) %>% unique()
+  return(x)
 
-    x <- x %>%
-      as.data.frame() %>%
-      mutate(peak_id = paste(seqnames,start,end, sep = "_")) %>%
-      select(peak_id, everything(), -seqnames, -start, -end, -strand, -width) %>%
-      replace(is.na(.), 0) %>% unique()
-
-
-    plot <- UpSetR::upset(data = x, order.by = "freq", ...)
-
-    return(plot)
-  }
 }
