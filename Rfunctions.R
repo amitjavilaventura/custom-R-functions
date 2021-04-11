@@ -3,6 +3,7 @@
 ######################
 
 # The paths may have to be changed depending on the current working directory
+# I use here, because it sets the working directory in the current project directory where I have the folder R with the Rfunctions.R and other scripts
 if(!require(here)){ install.packages("here") }; library(here)
 
 # ----- chromReads ----- #
@@ -49,9 +50,14 @@ source(here("R/DEcompare.R"))
 # function(s) that take a bigwig(s) and a bed(s) and compute the signal in the desired regions
 source(here("R/signals_in_regions.R"))
 
-# ----- Upset overlap peaks ----- # --> DOES NOT WORK WELL --> TRY WITH FIND OVERLAPS OF PEAKS
-# upset_overlap_peaks() --> computes the overlaps with different sets of peaks using plyranges and draws a UpSet plot using UpSetR
+# ----- Upset overlap peaks ----- #
+# upset_overlap_peaks() --> computes the overlaps with different sets of peaks using ChIPpeakAnno::makeVennDiagram() and draws a UpSet plot using UpSetR::upset()
 source(here("R/upset_overlap_peaks.R"))
+
+# ----- Setdiff ----- #
+# Functions from dfernandezperez to find unions and intersections of names
+source(here("R/setDiff.R"))
+
 
 # ----- chromHMM functions ----- #
 # already in the chromHMMviewR package

@@ -2,13 +2,14 @@
 ## Upset plot for overlapping peaks ##
 ######################################
 
-makeVenn4upSet <- function(peaks, conds = names(peaks), conds_order = conds){
+makeVenn4upSet <- function(peaks, conds = names(peaks), conds_order = conds, plot = F){
 
-  require(purrr)
-  require(dplyr)
-  require(magrittr)
-  require(ChIPpeakAnno)
   require(pkgcond)
+  require(purrr) %>% suppress_messages() %>% suppress_warnings()
+  require(dplyr) %>% suppress_messages() %>% suppress_warnings()
+  require(plyranges) %>% suppress_messages() %>% suppress_warnings()
+  require(magrittr) %>% suppress_messages() %>% suppress_warnings()
+  require(ChIPpeakAnno) %>% suppress_messages() %>% suppress_warnings()
 
   if(is.null(conds)) { stop("'conds' must not be NULL")}
 
@@ -16,7 +17,7 @@ makeVenn4upSet <- function(peaks, conds = names(peaks), conds_order = conds){
 
   overlaps <- peaks[conds_order] %>%
     purrr::map(~as_granges(.x)) %>%
-    makeVennDiagram(plot = F) %>%
+    makeVennDiagram(plot = plot) %>%
     suppress_messages() %>% suppress_warnings()
 
   overlaps <- overlaps$vennCounts
@@ -44,7 +45,6 @@ makeVenn4upSet <- function(peaks, conds = names(peaks), conds_order = conds){
 
 }
 
-
 # upset_overlap_peaks() -------------------------
 
 #' @title upset_overlap_peaks
@@ -57,19 +57,37 @@ makeVenn4upSet <- function(peaks, conds = names(peaks), conds_order = conds){
 #'
 #' @param peaks List of dataframes with the genomic coordinates of the regions to overlap. Dataframes must contain the columns seqnames, start, end.
 #' @param conds Character with the same length as the 'peaks' list. The names that are given to the diferente objects in the 'peaks' list. Default: 'names(peaks)'
-#' @param conds_order Character of the same length as 'conds'. Same values as in 'conds' but with the desired order of priority. Default: 'conds'
+#' @param conds_order Character of the same length as 'conds'. Same values as in 'conds' but with the desired order of priority. Default: 'conds'.
+#' @param title (Not available yet) Character of length 1 or NULL. Title of the plot shown at the top. Passed through grid.arrange(). If NULL, title is not shown. Default: NULL
 #' @param order.by Same as in UpSetR::upset(). One of "freq", "degree" or both.
+#' @param mainbar.y.label Same as in UpSetR::upset().
+#' @param sets.x.label Same as in UpSetR::upset().
 #' @param ... Further arguments to be passed through 'UpSetR::upset()'.
 
-upsetOverlapPeaks <- function(peaks, conds = names(peaks), conds_order = conds, order.by = "freq", ...){
+upsetOverlapPeaks <- function(peaks, conds = names(peaks), conds_order = conds,
+                              title = NULL,
+                              order.by = "freq", mainbar.y.label = "Intersect size", sets.x.label = "Set size",
+                              ...){
 
   require(UpSetR)
+  require(grid)
+  require(gridExtra)
 
-  x <- makeVenn4upSet(peaks, conds, conds_order)
+  # call makeVenn4upSet to retrieve the peak matrix
+  x <- makeVenn4upSet(peaks, conds, conds_order, plot = F)
 
-  upset <- UpSetR::upset(data = x$matrix, order.by = "freq", ...)
+  # draw upset plot with options
+  if(is.null(title)) {
+    upset <- UpSetR::upset(data = x$matrix, order.by = order.by, sets.x.label = sets.x.label, mainbar.y.label = mainbar.y.label)
+    return(upset)
 
-  return(upset)
+  } else {
+    plot.new()
+    UpSetR::upset(data = x$matrix, order.by = order.by, sets.x.label = sets.x.label, mainbar.y.label = mainbar.y.label)
+    grid.edit('arrange', name="upset")
+    vp <- grid.grab()
+    grid.arrange( grobs = list( vp ), top=title, cols=1 )
+  }
 }
 
 
