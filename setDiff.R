@@ -1,5 +1,4 @@
-### FUNCTIONS RETRIEVED FROM DFERNANDEZPEREZ
-
+### THE FUNCTIONS BELOW ARE RETRIEVED FROM DFERNANDEZPEREZ
 Combinations <- function(x){
   combs <-
     unlist(lapply(1:length(x),

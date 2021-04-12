@@ -134,7 +134,8 @@ overlap_peaks <- function(peaks1, peaks2, names = c("Peaks1", "Peaks2"),
 
   require(dplyr)
   require(plyranges)
-
+  require(purrr)
+  
   common <- filter_by_overlaps(x = peaks1 %>% as_granges(), y = peaks2 %>% as_granges()) %>%
     as.data.frame()
 
@@ -146,7 +147,9 @@ overlap_peaks <- function(peaks1, peaks2, names = c("Peaks1", "Peaks2"),
 
   list <- list("common" = common,
                "peaks1" = peaks1_unique,
-               "peaks2" = peaks2_unique)
+               "peaks2" = peaks2_unique) %>% 
+    
+    set_names(c("Common", names))
 
   if(write_files){
 
