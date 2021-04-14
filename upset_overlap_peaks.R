@@ -15,6 +15,8 @@ makeVenn4upSet <- function(peaks, conds = names(peaks), conds_order = conds, plo
 
   len <- length(peaks)
 
+  peaks <- peaks %>% set_names(nm = conds)
+
   overlaps <- peaks[conds_order] %>%
     purrr::map(~as_granges(.x)) %>%
     makeVennDiagram(plot = plot) %>%

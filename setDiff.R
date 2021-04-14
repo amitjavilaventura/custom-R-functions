@@ -1,3 +1,14 @@
+## MAKE VENN DIAGRAMS
+venn_2genes <- function(x, color = c("Darkred", "Darkblue"), fill = color, ...){
+
+  x <- Combinations(x)
+
+  draw.pairwise.venn(area1 = length(x[[1]])+length(x[[3]]), area2 = length(x[[2]])+length(x[[3]]), cross.area = length(x[[3]]),
+                     category = c(names(x[1]), names(x[2])), col = color, fill = fill, ...)
+
+}
+
+
 ### THE FUNCTIONS BELOW ARE RETRIEVED FROM DFERNANDEZPEREZ
 Combinations <- function(x){
   combs <-
@@ -43,3 +54,6 @@ Setdiff <- function (x, y) {
   yy <- Union(y)
   setdiff(xx, yy)
 }
+
+
+
