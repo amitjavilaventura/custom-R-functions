@@ -2,6 +2,13 @@
 
 R custom functions that are useful for different omics analyses.
 
+## TO DOs
+
+Functions to consider:
+
+* `tidyr::`,  `replace_na()`, `drop_na()`, `pivot_longer()`, `pivot_wider()`, `ùnite()`, `join_all()`, `complete()`, `full_seq()`
+
+
 ## `Rfunctions.R`
 
 Script that loads all the functions by doing source of the other R scripts present in this repository.

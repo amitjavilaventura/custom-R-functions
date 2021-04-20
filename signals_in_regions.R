@@ -52,14 +52,14 @@ signal_in_regions <- function(bigwig, regions, names, names_order = names, opera
 #' Function that takes a path to a bigwig files (bigwig) and several paths to a BED files (regions) to compute the signal in those regions.
 #' It return a dataframe with all the coordinates their scores and the bedfile of origin.
 #'
-#' @param bigwigs Character of length non defined length. Path(s) to the desired bigwig files
+#' @param bigwigs Character of non defined length. Path(s) to the desired bigwig files
 #' @param region Character of length 1. Path to the desired BED file.
 #' @param names Character of the same length as 'bigwigs'. Names of the regions in the bedfiles.
 #' @param names_order Character with the same values as in 'names' but in the desired order for further plotting. Default: names
 #' @param operation Caracter of length 1. Operation to calculate the score. One of c("sum", "mean", "max", "min"). Default: "mean"
 #' @param bind Character of length 1. Bind the coverages for the different bigwigs, either by rows or by columns. One of c("rows", "cols") or NULL. If NULL, coverages won't be merged and a list with different dataframes will be returned
 #'
-signals_in_1region <- function(bigwigs, regions, names, names_order = names, operation = "mean", bind = "rows"){
+signals_in_1region <- function(bigwigs, region, names, names_order = names, operation = "mean", bind = "rows"){
 
   require(megadepth)
   require(dplyr)
@@ -70,7 +70,7 @@ signals_in_1region <- function(bigwigs, regions, names, names_order = names, ope
   list <- list()
   for(i in 1:length(bigwigs)){
 
-    coverage <- get_coverage(bigwigs[i], regions, op = operation)
+    coverage <- get_coverage(bigwigs[i], region, op = operation)
 
     if(bind == "rows"){ coverage <- coverage %>% as_tibble() %>% mutate(signal_from = names[i]) }
     else if(bind == "cols") { coverage <- coverage %>%
