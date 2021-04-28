@@ -35,13 +35,13 @@
 #' @param degsLabelNum Numerical. Number of most expressed genes to label in the plot. The double of this number will be labelled (once for DEGs with lowest p-value and once for the DEGs with highest log2fFC in absolute value). Default: 5.
 #' @param degsLabelSize Numerical. Size of the labels of the DEGs Default: 3.
 #' @param ggrastr Logical. If TRUE, the points of the volcano plot are drawn with geom_points_rast instead of geom_point. Default: FALSE.
-#' @param plotly Logical. If TRUE, the ggplot object will be passed to 'ggplotlify()' to transform it to an interactive plotly graph.
 
 volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
                          pval = 0.05, log2FC = 1.5,
                          main = NULL, mainSize = 9, sub = NULL, subSize = 8,
                          labelSize = 7, labelColor = c("darkgreen", "red"), labelPos = 0,
-                         xlab = bquote(~Log[2]~ "FC"), ylab = (bquote(~-Log[10]~italic(P))) , axisLabelSize = 10, axisTextSize = 9,
+                         xlab = bquote(~Log[2]~ "FC"), ylab = (bquote(~-Log[10]~italic(P))), 
+                         axisLabelSize = 10, axisTextSize = 9,
                          pointColor = c("darkgreen", "gray", "red"), legendTitle = FALSE, legendPos = "bottom",
                          degsLabel = F , degsLabelNum=5, degsLabelSize = 3,
                          ggrastr = F) {
@@ -49,10 +49,16 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
   #load packages
   require(ggplot2)
   require(dplyr)
+  
+  
 
-  # Mutate the dataframe to include the shape of the points.
+  
   df <- df %>%
-
+    
+    # Mutate the dataframe to convert NA in DEG to "NS".
+    dplyr::mutate(DEG = ifelse(test = is.na(DEG), yes = "NS", no = DEG)) %>%
+    
+    # Mutate the dataframe to include the shape of the points.
     # Shape of al the points
     dplyr::mutate(shape = "circle") %>%
 
