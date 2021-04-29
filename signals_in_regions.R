@@ -30,12 +30,12 @@ signal_in_regions <- function(bigwig, regions, names, names_order = names, opera
   for(i in 1:length(regions)){
 
     coverage <- get_coverage(bigwig, regions[i], op = operation)  %>%
-      as_tibble() %>% mutate(condition = names[i])
+      as_tibble() %>% mutate(region = names[i])
 
     list[[names[i]]] <- coverage
   }
 
-  if(merge){ list <- bind_rows(list) %>% mutate(condition = factor(condition, levels = names_order)) }
+  if(merge){ list <- bind_rows(list) %>% mutate(region = factor(region, levels = names_order)) }
 
   return(list)
 

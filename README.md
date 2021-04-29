@@ -4,10 +4,11 @@ R custom functions that are useful for different omics analyses.
 
 ## TO DOs
 
-Functions to consider:
+Functions and packages to consider:
 
-* `tidyr::`,  `replace_na()`, `drop_na()`, `pivot_longer()`, `pivot_wider()`, `ùnite()`, `join_all()`, `complete()`, `full_seq()`, `unnest_wider()`, `unnest_longer()`
-
+* `dplyr::`: `add_count()`, `mutate_if()`, `summarise_if()`
+* `tidyr::`: `replace_na()`, `drop_na()`, `pivot_longer()`, `pivot_wider()`, `ùnite()`, `join_all()`, `complete()`, `full_seq()`, `unnest_wider()`, `unnest_longer()`, `gather()`
+* `forcats::`: `fct_reorder()`, `fct_relevel()`, `fct_rev()`
 
 ## `Rfunctions.R`
 
