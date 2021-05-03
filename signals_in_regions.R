@@ -105,6 +105,55 @@ signals_in_1region <- function(bigwigs, region, names, names_order = names, oper
 
 }
 
+signals_in_regions <- function(bigwigs, regions, 
+                               bw_names = names(bigwigs), bw_names_order = bw_names, 
+                               bed_names = names(bigwigs), bed_names_order = bed_names,
+                               operation = "mean", merge = T){
+  
+  # Load packages
+  require(megadepth)
+  require(dplyr)
+  
+  if(!is.character(bigwigs) | !is.character(regions)){ stop("'bigwigs' and 'regions' must be character vectors with the path to each BIGWIG and BEDFILE, respectively") }
+  if(is.null(bw_names) | is.null(bed_names)){ stop("'bw_names' and 'bed_names' must be a not NULL character vector") }
+  if(length(bigwigs) != length(bw_names)){ stop("'bigwigs' and 'bw_names' must have the same length") }
+  if(length(regions) != length(bed_names)){ stop("'regions' and 'bed_names' must have the same length") }
+  
+  # Initialize list to store GRanges objects with the coverage
+  signal_list <- list()
+  
+  # Go through each bigwig
+  for(i in 1:length(bigwigs)){ 
+    # Go through each bedfile
+    for(j in 1:length(regions)){
+    
+      # Compute the coverage from each bigwig in each region in the bedfiles
+      # The operation to compute the coverage in each region is the "mean" by default.
+      # 'get_coverage()' returns a GRanges object
+      coverage <- megadepth::get_coverage(bigwigs[i], regions[j], op = operation)  %>%
+        # Convert GRanges to tibble/dataframe
+        dplyr::as_tibble() %>% 
+        # Create new columns for the names of condition of each bedfile and each bigwig
+        dplyr::mutate(region = bed_names[j], signal_from = bw_names[i])
+    
+      # Store the coverage dataframe to the list
+      signal_list[[paste(bw_names[i], "in", bed_names[j], sep="_")]] <- coverage
+    }
+  }
+  
+  # Conditional if merge == T
+  # Merge the dataframes by rows
+  # Converts the variables 'region' and 'signal_from' to factor
+  # Order these variables by levels
+  if(merge){ 
+    signal_list <- dplyr::bind_rows(signal_list) %>% 
+      dplyr::mutate(region = factor(region, levels = bed_names_order),
+                    signal_from = factor(signal_from, levels = bw_names_order)) }
+  
+  # Return list
+  return(signal_list)
+  
+}
 
 #### some function to boxplot
 #### some function to heatmap

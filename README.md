@@ -162,3 +162,11 @@ Function that draws a ggplot2-based heatmap with the state enrichment in genomic
   + `reshape2`
   + `ggpubr`
   + `magrittr`
+
+## `signals_in_regions.R`
+
+Functions that compute the coverage (BIGWIG) over several regions (BED).
+
+* Input: 
+  + character vector with the path(s) to bed files;
+  + character vector with the path(s) to bigwig files.
