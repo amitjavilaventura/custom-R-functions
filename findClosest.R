@@ -141,5 +141,3 @@ findClosestCoords <- function(x, y, k = 2, y_cols = c("seqnames", "start", "end"
   return(x)
   
 }
-
-findClosestCoords(x, y)
