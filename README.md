@@ -10,6 +10,11 @@ Functions and packages to consider:
 * `tidyr::`: `replace_na()`, `drop_na()`, `pivot_longer()`, `pivot_wider()`, `ùnite()`, `join_all()`, `complete()`, `full_seq()`, `unnest_wider()`, `unnest_longer()`, `gather()`
 * `forcats::`: `fct_reorder()`, `fct_relevel()`, `fct_rev()`
 
+
+* `GenomicRanges::`: 
+    
+    + `distance()`: I pretend to do a function which finds the closest and 2nd, 3rd... closest features (e.g. TSSs, promoters...) to a set of peaks (e.g. ChIP-seq distal peaks)
+
 ## `Rfunctions.R`
 
 Script that loads all the functions by doing source of the other R scripts present in this repository.
