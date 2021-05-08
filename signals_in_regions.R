@@ -107,17 +107,38 @@ signals_in_1region <- function(bigwigs, region, names, names_order = names, oper
 
 signals_in_regions <- function(bigwigs, regions, 
                                bw_names = names(bigwigs), bw_names_order = bw_names, 
-                               bed_names = names(bigwigs), bed_names_order = bed_names,
+                               bed_names = names(regions), bed_names_order = bed_names,
                                operation = "mean", merge = T){
   
   # Load packages
   require(megadepth)
   require(dplyr)
   
-  if(!is.character(bigwigs) | !is.character(regions)){ stop("'bigwigs' and 'regions' must be character vectors with the path to each BIGWIG and BEDFILE, respectively") }
-  if(is.null(bw_names) | is.null(bed_names)){ stop("'bw_names' and 'bed_names' must be a not NULL character vector") }
-  if(length(bigwigs) != length(bw_names)){ stop("'bigwigs' and 'bw_names' must have the same length") }
-  if(length(regions) != length(bed_names)){ stop("'regions' and 'bed_names' must have the same length") }
+  # Check if inputs are OK
+  if(!is.character(bigwigs)){ stop("'bigwigs' and must be a character vector with the path to each BIGWIG.") }
+  elif if(!is.charachter(regions) | !is.list(regions)){ stop("'regions' must be a character vector with the path to each BED or a lists of data frames with the seqnames, start and end columns")}
+  elif if(is.null(bw_names) | is.null(bed_names)){ stop("'bw_names' and 'bed_names' must be a not NULL character vector.") }
+  elif if(length(bigwigs) != length(bw_names)){ stop("'bigwigs' and 'bw_names' must have the same length.") }
+  elif if(length(regions) != length(bed_names)){ stop("'regions' and 'bed_names' must have the same length.") }
+  
+  # Write temporary files in case 'regions' is a list of dataframes.
+  if(is.list(regions)){
+    
+    temp_dir <- tempdir(check = T)
+    
+    for(i in 1:length(regions)){
+      if(!is.data.frame(regions[[i]])){ stop("If 'regions' is a list, each element in 'regions' must be a data frame with the seqnames, start and end columns. ") }
+      else{
+        name <- paste(bed_names[i], "_temp", sep = "")
+        temporary <- tempfile(pattern = name, tmpdir = temp_dir, fileext = ".bed")
+        regions[[i]] %>% write.table(file = temporary, quote = F, sep = "\t", row.names = F, col.names = F)
+      }
+    }
+  
+  # List the path of the temporary files
+  regions <- list.files(path = temp_dir, pattern = ".bed", full.names = T, recursive = T)  
+  
+  }
   
   # Initialize list to store GRanges objects with the coverage
   signal_list <- list()
