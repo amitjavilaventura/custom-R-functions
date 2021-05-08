@@ -77,13 +77,13 @@ findDeNovoTargets <- function(x, y){
   # Genes targeted only in Y and not in X
   ## Targeted in the promoter
   genes_target_notarget_prom <- y.promo %>% 
-    dplyr::filter((SYMBOL %in% x.promo$SYMBOL)) %>%
+    dplyr::filter(!(SYMBOL %in% x.promo$SYMBOL)) %>%
     dplyr::select(seqnames, "start" = geneStart, "end" = geneEnd, SYMBOL, geneLength, "strand" = geneStrand) %>% 
     unique()
   
   ## Targeted by a distal peak
   genes_target_notarget_dist <- y.distal %>% as_granges() %>%
-    filter_by_overlaps(x.distal %>% as_granges) %>%
+    filter_by_non_overlaps(x.distal %>% as_granges) %>%
     as_tibble() %>% 
     dplyr::select(seqnames, "start" = geneStart, "end" = geneEnd, SYMBOL, geneLength, "strand" = geneStrand) %>% 
     unique()
