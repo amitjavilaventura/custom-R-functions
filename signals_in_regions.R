@@ -116,10 +116,10 @@ signals_in_regions <- function(bigwigs, regions,
   
   # Check if inputs are OK
   if(!is.character(bigwigs)){ stop("'bigwigs' and must be a character vector with the path to each BIGWIG.") }
-  elif if(!is.charachter(regions) | !is.list(regions)){ stop("'regions' must be a character vector with the path to each BED or a lists of data frames with the seqnames, start and end columns")}
-  elif if(is.null(bw_names) | is.null(bed_names)){ stop("'bw_names' and 'bed_names' must be a not NULL character vector.") }
-  elif if(length(bigwigs) != length(bw_names)){ stop("'bigwigs' and 'bw_names' must have the same length.") }
-  elif if(length(regions) != length(bed_names)){ stop("'regions' and 'bed_names' must have the same length.") }
+  else if(!is.charachter(regions) | !is.list(regions)){ stop("'regions' must be a character vector with the path to each BED or a lists of data frames with the seqnames, start and end columns")}
+  else if(is.null(bw_names) | is.null(bed_names)){ stop("'bw_names' and 'bed_names' must be a not NULL character vector.") }
+  else if(length(bigwigs) != length(bw_names)){ stop("'bigwigs' and 'bw_names' must have the same length.") }
+  else if(length(regions) != length(bed_names)){ stop("'regions' and 'bed_names' must have the same length.") }
   
   # Write temporary files in case 'regions' is a list of dataframes.
   if(is.list(regions)){
