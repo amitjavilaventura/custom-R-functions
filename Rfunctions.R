@@ -54,19 +54,14 @@ source(here("R/signals_in_regions.R"))
 # upset_overlap_peaks() --> computes the overlaps with different sets of peaks using ChIPpeakAnno::makeVennDiagram() and draws a UpSet plot using UpSetR::upset()
 source(here("R/upset_overlap_peaks.R"))
 
+# ----- FindDeNovoTargets ----- #
+
+source(here("R/FindDeNovoTargets.R"))
+
+
 # ----- Setdiff ----- #
 # Functions from dfernandezperez to find unions and intersections of names
 source(here("R/setDiff.R"))
-
-
-# ----- chromHMM functions ----- #
-# already in the chromHMMviewR package
-#source(here("R/chromHMM_functions.R"))
-
-
-
-
-
 
 # ----- GOenrichment ----- #
 # A function that does enrichGO

@@ -116,7 +116,7 @@ signals_in_regions <- function(bigwigs, regions,
   
   # Check if inputs are OK
   if(!is.character(bigwigs)){ stop("'bigwigs' and must be a character vector with the path to each BIGWIG.") }
-  else if(!is.character(regions) | !is.list(regions)){ stop("'regions' must be a character vector with the path to each BED or a lists of data frames with the seqnames, start and end columns")}
+  else if(!class(regions) %in% c("character", "list")){ stop("'regions' must be a character vector with the path to each BED or a lists of data frames with the seqnames, start and end columns")}
   else if(is.null(bw_names) | is.null(bed_names)){ stop("'bw_names' and 'bed_names' must be a not NULL character vector.") }
   else if(length(bigwigs) != length(bw_names)){ stop("'bigwigs' and 'bw_names' must have the same length.") }
   else if(length(regions) != length(bed_names)){ stop("'regions' and 'bed_names' must have the same length.") }
@@ -137,7 +137,6 @@ signals_in_regions <- function(bigwigs, regions,
   
   # List the path of the temporary files
   regions <- list.files(path = temp_dir, pattern = ".bed", full.names = T, recursive = T)  
-  
   }
   
   # Initialize list to store GRanges objects with the coverage
@@ -161,6 +160,13 @@ signals_in_regions <- function(bigwigs, regions,
       signal_list[[paste(bw_names[i], "in", bed_names[j], sep="_")]] <- coverage
     }
   }
+  
+  # Remove tempfiles in tempdir
+  if(is.list(regions)){ 
+    file.remove(regions)
+    if(file.exists(regions)) { print("Temporary files have not been removed") }
+  }
+  
   
   # Conditional if merge == T
   # Merge the dataframes by rows

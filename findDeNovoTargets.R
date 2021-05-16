@@ -131,7 +131,4 @@ searchProm <- function(x, region = c(2500, 2500)){
   return(x.tss)  
   
 }
-  
 
-apc_wtn_targeted_bcat$genes_target_denovo_all->x
-  
