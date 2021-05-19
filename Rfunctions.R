@@ -55,8 +55,7 @@ source(here("R/signals_in_regions.R"))
 source(here("R/upset_overlap_peaks.R"))
 
 # ----- FindDeNovoTargets ----- #
-
-source(here("R/FindDeNovoTargets.R"))
+source(here("R/findDeNovoTargets.R"))
 
 
 # ----- Setdiff ----- #
@@ -126,38 +125,38 @@ chip_stats <- function(df, conditions = NULL){
 # funtion that overlaps two sets of peaks and returns common and unique peaks (uses plyranges filter_by_overlaps and filter_by_non_overlaps)
 overlap_peaks <- function(peaks1, peaks2, names = c("Peaks1", "Peaks2"),
                           write_files = F, out_dir = "", out_format = ".tsv", colnames = T){
-  
+
   require(dplyr)
   require(plyranges)
   require(purrr)
-  
+
   common <- filter_by_overlaps(x = peaks1 %>% as_granges(), y = peaks2 %>% as_granges()) %>%
     as.data.frame()
-  
+
   peaks1_unique <- filter_by_non_overlaps(x = peaks1 %>% as_granges(), y = peaks2 %>% as_granges()) %>%
     as.data.frame()
-  
+
   peaks2_unique <- filter_by_non_overlaps(x = peaks2 %>% as_granges(), y = peaks1 %>% as_granges()) %>%
     as.data.frame()
-  
+
   list <- list("common" = common,
                "peaks1" = peaks1_unique,
-               "peaks2" = peaks2_unique) %>% 
-    
+               "peaks2" = peaks2_unique) %>%
+
     set_names(c("Common", names))
-  
+
   if(write_files){
-    
+
     dir.create(path = out_dir, showWarnings = F, recursive = T)
-    
+
     write.table(x = list[["common"]], file = paste(out_dir, "/", paste(names[1], names[2], "common", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
     write.table(x = list[["peaks1"]], file = paste(out_dir, "/", paste(names[1], "unique", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
     write.table(x = list[["peaks2"]], file = paste(out_dir, "/", paste(names[2], "unique", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
-    
+
   } else{
     return(list)
   }
-  
+
 }
 
 # ----- overlap_peaks ----- #
@@ -165,37 +164,37 @@ overlap_peaks <- function(peaks1, peaks2, names = c("Peaks1", "Peaks2"),
 # funtion that overlaps two sets of peaks and returns common and unique peaks (uses plyranges filter_by_overlaps and filter_by_non_overlaps)
 overlap_peaks2 <- function(peak_list, names = names(peak_list),
                            write_files = F, out_dir = "", out_format = ".tsv", colnames = T){
-  
+
   require(dplyr)
   require(plyranges)
   require(purrr)
-  
+
   if(length(peak_list) != 2){ stop("'peak_list' must have to sets of peaks") }
-  
+
   common <- filter_by_overlaps(x = peak_list[[1]] %>% as_granges(), y = peak_list[[2]] %>% as_granges()) %>%
     as.data.frame()
-  
+
   peaks1_unique <- filter_by_non_overlaps(x = peak_list[[1]] %>% as_granges(), y = peak_list[[2]] %>% as_granges()) %>%
     as.data.frame()
-  
+
   peaks2_unique <- filter_by_non_overlaps(x = peak_list[[2]] %>% as_granges(), y = peak_list[[1]] %>% as_granges()) %>%
     as.data.frame()
-  
+
   overlaps <- list("common" = common,
                    "peaks1" = peaks1_unique,
                    "peaks2" = peaks2_unique)
   names(overlaps) <- c("Common", names)
-  
+
   if(write_files){
-    
+
     dir.create(path = out_dir, showWarnings = F, recursive = T)
-    
+
     write.table(x = common, file = paste(out_dir, "/", paste(names[1], names[2], "common", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
     write.table(x = peaks1_unique, file = paste(out_dir, "/", paste(names[1], "unique", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
     write.table(x = peaks2_unique, file = paste(out_dir, "/", paste(names[2], "unique", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
-    
+
   }
-  
+
   return(overlaps)
-  
+
 }
