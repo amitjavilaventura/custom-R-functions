@@ -105,27 +105,27 @@ signals_in_1region <- function(bigwigs, region, names, names_order = names, oper
 
 }
 
-signals_in_regions <- function(bigwigs, regions, 
-                               bw_names = names(bigwigs), bw_names_order = bw_names, 
+signals_in_regions <- function(bigwigs, regions,
+                               bw_names = names(bigwigs), bw_names_order = bw_names,
                                bed_names = names(regions), bed_names_order = bed_names,
                                operation = "mean", merge = T){
-  
+
   # Load packages
   require(megadepth)
   require(dplyr)
-  
+
   # Check if inputs are OK
   if(!is.character(bigwigs)){ stop("'bigwigs' and must be a character vector with the path to each BIGWIG.") }
   else if(!class(regions) %in% c("character", "list")){ stop("'regions' must be a character vector with the path to each BED or a lists of data frames with the seqnames, start and end columns")}
   else if(is.null(bw_names) | is.null(bed_names)){ stop("'bw_names' and 'bed_names' must be a not NULL character vector.") }
   else if(length(bigwigs) != length(bw_names)){ stop("'bigwigs' and 'bw_names' must have the same length.") }
   else if(length(regions) != length(bed_names)){ stop("'regions' and 'bed_names' must have the same length.") }
-  
+
   # Write temporary files in case 'regions' is a list of dataframes.
   if(is.list(regions)){
-    
+
     temp_dir <- tempdir(check = T)
-    
+
     for(i in 1:length(regions)){
       if(!is.data.frame(regions[[i]])){ stop("If 'regions' is a list, each element in 'regions' must be a data frame with the seqnames, start and end columns. ") }
       else{
@@ -134,52 +134,52 @@ signals_in_regions <- function(bigwigs, regions,
         regions[[i]] %>% write.table(file = temporary, quote = F, sep = "\t", row.names = F, col.names = F)
       }
     }
-  
+
   # List the path of the temporary files
-  regions <- list.files(path = temp_dir, pattern = ".bed", full.names = T, recursive = T)  
+  regions <- list.files(path = temp_dir, pattern = ".bed", full.names = T, recursive = T)
   }
-  
+
   # Initialize list to store GRanges objects with the coverage
   signal_list <- list()
-  
+
   # Go through each bigwig
-  for(i in 1:length(bigwigs)){ 
+  for(i in 1:length(bigwigs)){
     # Go through each bedfile
     for(j in 1:length(regions)){
-    
+
       # Compute the coverage from each bigwig in each region in the bedfiles
       # The operation to compute the coverage in each region is the "mean" by default.
       # 'get_coverage()' returns a GRanges object
       coverage <- megadepth::get_coverage(bigwigs[i], regions[j], op = operation)  %>%
         # Convert GRanges to tibble/dataframe
-        dplyr::as_tibble() %>% 
+        dplyr::as_tibble() %>%
         # Create new columns for the names of condition of each bedfile and each bigwig
         dplyr::mutate(region = bed_names[j], signal_from = bw_names[i])
-    
+
       # Store the coverage dataframe to the list
       signal_list[[paste(bw_names[i], "in", bed_names[j], sep="_")]] <- coverage
     }
   }
-  
+
   # Remove tempfiles in tempdir
-  if(is.list(regions)){ 
+  if(is.list(regions)){
     file.remove(regions)
     if(file.exists(regions)) { print("Temporary files have not been removed") }
   }
-  
-  
+
+
   # Conditional if merge == T
   # Merge the dataframes by rows
   # Converts the variables 'region' and 'signal_from' to factor
   # Order these variables by levels
-  if(merge){ 
-    signal_list <- dplyr::bind_rows(signal_list) %>% 
+  if(merge){
+    signal_list <- dplyr::bind_rows(signal_list) %>%
       dplyr::mutate(region = factor(region, levels = bed_names_order),
                     signal_from = factor(signal_from, levels = bw_names_order)) }
-  
+
   # Return list
   return(signal_list)
-  
+
 }
 
 #### some function to boxplot

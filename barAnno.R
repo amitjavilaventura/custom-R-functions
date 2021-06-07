@@ -15,8 +15,9 @@
 #'
 #' @param anno_list List of annotation objects that come from annotatePeak(). If anno_df is specified, anno_list must be null, otherwise must be specified.
 #' @param names Charachter vector of the same length as 'anno_list'. Names that will be given to each of the objects in anno_list. Not that will be the names plotted in the bargraph
-#' @param names_order Character vector with the same entries as 'names' with the order wanted to plot the data. Defaults to: names.
+#' @param names_order Character vector with the same entries as 'names' with the order wanted to plot the data. Defaults to: unique(names).
 #' @param protein Character vector of the same length as 'anno_list' with the protein chipped in each dataframe of anno_list. This names will be passed through `facet_wrap()`. Only works if facet is set to TRUE. Default: NULL.
+#' @param protein_order Character vector with the same entries as 'protein' with the order wanted to plot the data. Defaults to: unique(protein).
 #' @param main Character of lenght 1. Title of the plot. Default: NULL.
 #' @param subtitle Character of lenght 1. Subtitle of the plot. Default: NULL.
 #' @param ylab Character of lenght 1. Title of the Y axis. Default: NULL.
@@ -30,8 +31,8 @@
 #' @param xangle Integer number. Angle of the text in the X axis
 
 barAnno  <- function(anno_list,
-                     names, names_order = names,
-                     protein = NULL,
+                     names, names_order = unique(names),
+                     protein = NULL, protein_order = unique(protein),
                      main = NULL,
                      subtitle = NULL,
                      ylab = NULL, xlab = NULL,
@@ -40,14 +41,14 @@ barAnno  <- function(anno_list,
                      is_anno = F, facet = F, anno_num = 3,
                      position_fill = T,
                      xangle = 20){
-  
+
   # Load packages
   library(dplyr)
   library(purrr)
   library(ggplot2)
   library(ggpubr)
   library(magrittr)
-  
+
   if(facet & is.null(protein)){
     message1 <- "If 'facet' is TRUE, the argument 'protein' must be specified."
     message2 <- "The argument 'protein' must be a character vector of the same length as 'names',
@@ -56,10 +57,10 @@ barAnno  <- function(anno_list,
   }
   else{
     if(!is.null(anno_list)){
-      
+
       # Create list for annotations from the list of annotatePeak object provided as input
       anno <- list()
-      
+
       # Format promoter annnotation names to take parentheses out for each annotatePeak object in the list
       if(is_anno){
         for(i in 1:length(anno_list)){
@@ -71,40 +72,41 @@ barAnno  <- function(anno_list,
           anno[[i]] <- sub(" \\(.*\\)", "", anno_list[[i]]$annotation)
         }
       }
-      
-      
+
+
       # Set the names of each annotatePeak object in the list with the vector names
       anno_df <- set_names(x = anno, nm = names) %>%
-        
+
         # Convert the annotatePeak objects to dataframe
         purrr::map(~as_tibble(x = .x)) %>%
-        
+
         # Write an extra column to each dataframe with the name of the dataframe (provided in names)
         purrr::imap(~mutate(.data = .x, sample = as.character(.y))) %>%
-        
+
         # Set column names
         purrr::map(~set_colnames(x = .x, c(c("annotation", "sample")))) %>%
         purrr::map(~dplyr::mutate(.data = .x, annotation = as.character(annotation)))
-      
+
       if(facet){
         anno_df <- set_names(x = anno_df, nm = protein) %>%
-          
+
           # Write an extra column to each dataframe with the name of the dataframe (provided in names)
           purrr::imap(~mutate(.data = .x, protein = as.character(.y))) %>%
-          
+
           # Set column names
           purrr::map(~set_colnames(x = .x, c(c("annotation", "sample", "protein"))))
       }
-      
+
       # Bind dataframes by rows
       anno_df <- anno_df %>% bind_rows() %>%
-        
+
         # Mutate the names in order to
         dplyr::mutate(sample = factor(sample, levels = names_order))
     }
-    # if input is dataframe with different conditions
-    
-    
+
+    if(facet){ anno_df <- anno_df %>% dplyr::mutate(protein = factor(protein, levels = protein_order)) }
+
+
   }
   # Rewrite annotation as distal or gene body depending on the feature
   if(anno_num == 2){
@@ -127,10 +129,10 @@ barAnno  <- function(anno_list,
                                                "5' UTR" = "Gene body",
                                                "3' UTR" = "Gene body"))
   }
-  
+
   # Start ggplot
   g <- ggplot(anno_df, aes(sample, fill = annotation))
-  
+
   # Create gglpot2-based barplot
   if(position_fill){
     if(facet){ g <- g + geom_bar(position = "fill", color = "Black") + facet_wrap(~protein) }
@@ -140,17 +142,17 @@ barAnno  <- function(anno_list,
     if(facet){ g <- g + geom_bar(color = "Black") + facet_wrap(~protein) }
     else{ g <- g + geom_bar(color = "Black") }
   }
-  
+
   # Write plot title, subtitle and axis labels
   g <- g + ggtitle(main, subtitle = subtitle) + ylab(ylab) + xlab(xlab) +
-    
+
     # Format colors with ggplot2 function scale_fill_brewer
     scale_fill_brewer(palette = palette) +
-    
+
     # Basic formatting
     theme_pubr(legend = legend_position, x.text.angle = xangle, border = T) +
     theme(legend.title = element_blank())
-  
+
   # Return plot
   return(g)
 }

@@ -162,14 +162,14 @@ overlap_peaks <- function(peaks1, peaks2, names = c("Peaks1", "Peaks2"),
 # ----- overlap_peaks ----- #
 # author: amitjavilaventura
 # funtion that overlaps two sets of peaks and returns common and unique peaks (uses plyranges filter_by_overlaps and filter_by_non_overlaps)
-overlap_peaks2 <- function(peak_list, names = names(peak_list),
-                           write_files = F, out_dir = "", out_format = ".tsv", colnames = T){
+overlap_peaks2 <- function(peak_list, Names = names(peak_list),
+                           write_files = F, out_dir = ".", out_format = ".bed", colnames = F){
 
   require(dplyr)
   require(plyranges)
   require(purrr)
 
-  if(length(peak_list) != 2){ stop("'peak_list' must have to sets of peaks") }
+  if(length(peak_list) != 2){ stop("'peak_list' must have two sets of peaks") }
 
   common <- filter_by_overlaps(x = peak_list[[1]] %>% as_granges(), y = peak_list[[2]] %>% as_granges()) %>%
     as.data.frame()
@@ -180,18 +180,16 @@ overlap_peaks2 <- function(peak_list, names = names(peak_list),
   peaks2_unique <- filter_by_non_overlaps(x = peak_list[[2]] %>% as_granges(), y = peak_list[[1]] %>% as_granges()) %>%
     as.data.frame()
 
-  overlaps <- list("common" = common,
-                   "peaks1" = peaks1_unique,
-                   "peaks2" = peaks2_unique)
-  names(overlaps) <- c("Common", names)
+  overlaps <- list(common, peaks1_unique, peaks2_unique)
+  overlaps <- overlaps %>% set_names(nm = c("Common", Names[1], Names[2]))
 
   if(write_files){
 
     dir.create(path = out_dir, showWarnings = F, recursive = T)
 
-    write.table(x = common, file = paste(out_dir, "/", paste(names[1], names[2], "common", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
-    write.table(x = peaks1_unique, file = paste(out_dir, "/", paste(names[1], "unique", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
-    write.table(x = peaks2_unique, file = paste(out_dir, "/", paste(names[2], "unique", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
+    write.table(x = common, file = paste0(out_dir, "/", paste(Names[1], Names[2], "common", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
+    write.table(x = peaks1_unique, file = paste0(out_dir, "/", paste(Names[1], "unique", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
+    write.table(x = peaks2_unique, file = paste0(out_dir, "/", paste(Names[2], "unique", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
 
   }
 

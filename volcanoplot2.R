@@ -31,7 +31,7 @@
 #' @param pointColor Character of length 3. Colors of the downregulated, notDE and upregulated points. Default: c("darkgreen", "gray", "red")
 #' @param legendTitle Logical. If FALSE, the title of the legend is not plotted. Default: FALSE.
 #' @param legendPos Character. Position of the legend. One of: "bottom", "top", "right", "left", "none". Default: "bottom".
-#' @param degsLabel Logical. If TRUE, the genes with highest log2FC in absolute are labelled. Default: FALSE.
+#' @param degsLabel Logical or character. If TRUE, the genes with highest log2FC in absolute are labelled. If character, it has to contain the names of the genes that are wanted to appear in the plot. Default: FALSE.
 #' @param degsLabelNum Numerical. Number of most expressed genes to label in the plot. The double of this number will be labelled (once for DEGs with lowest p-value and once for the DEGs with highest log2fFC in absolute value). Default: 5.
 #' @param degsLabelSize Numerical. Size of the labels of the DEGs Default: 3.
 #' @param ggrastr Logical. If TRUE, the points of the volcano plot are drawn with geom_points_rast instead of geom_point. Default: FALSE.
@@ -40,7 +40,7 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
                          pval = 0.05, log2FC = 1.5,
                          main = NULL, mainSize = 9, sub = NULL, subSize = 8,
                          labelSize = 7, labelColor = c("darkgreen", "red"), labelPos = 0,
-                         xlab = bquote(~Log[2]~ "FC"), ylab = (bquote(~-Log[10]~italic(P))), 
+                         xlab = bquote(~Log[2]~ "FC"), ylab = (bquote(~-Log[10]~italic(P))),
                          axisLabelSize = 10, axisTextSize = 9,
                          pointColor = c("darkgreen", "gray", "red"), legendTitle = FALSE, legendPos = "bottom",
                          degsLabel = F , degsLabelNum=5, degsLabelSize = 3,
@@ -49,15 +49,15 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
   #load packages
   require(ggplot2)
   require(dplyr)
-  
-  
 
-  
+
+
+
   df <- df %>%
-    
+
     # Mutate the dataframe to convert NA in DEG to "NS".
     dplyr::mutate(DEG = ifelse(test = is.na(DEG), yes = "NS", no = DEG)) %>%
-    
+
     # Mutate the dataframe to include the shape of the points.
     # Shape of al the points
     dplyr::mutate(shape = "circle") %>%
@@ -145,7 +145,29 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
   }
 
   # Write names of the most DE genes in terms of lowest adjusted p-value
-  if(degsLabel) {
+  if(is.logical(degsLabel)){
+
+    if(degsLabel) {
+
+      # Load ggrepel
+      require(ggrepel)
+
+      # Organaize and retrieve lowest p-value genes
+      degs <- df %>%
+
+        # Filter non significant genes
+        dplyr::filter(DEG!="NS") %>%
+
+        # Arrange by ascendent order of padjusted
+        dplyr::arrange(padj)
+
+      # Create a dataframe with the labels of the DEGs with highest abs(log2FC).
+      degs <- head(na.omit(degs),degsLabelNum) %>% as.data.frame()
+
+      # Put labels in the plot
+      p <- p + geom_text_repel(data = degs, mapping = aes(x = log2FoldChange, y = -log10(padj), label = Geneid), size = degsLabelSize, color = "Black")
+    }
+  } else if(is.character(degsLabel)){
 
     # Load ggrepel
     require(ggrepel)
@@ -154,18 +176,12 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
     degs <- df %>%
 
       # Filter non significant genes
-      dplyr::filter(DEG!="NS") %>%
-
-      # Arrange by ascendent order of padjusted
-      dplyr::arrange(padj)
-
-    # Create a dataframe with the labels of the DEGs with highest abs(log2FC).
-    degs <- head(na.omit(degs),degsLabelNum) %>% as.data.frame()
+      dplyr::filter(Geneid %in% degsLabel)
 
     # Put labels in the plot
     p <- p + geom_text_repel(data = degs, mapping = aes(x = log2FoldChange, y = -log10(padj), label = Geneid), size = degsLabelSize, color = "Black")
-  }
 
+  }
   # Draw the graph.
   return(p)
 
