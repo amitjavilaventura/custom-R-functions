@@ -175,13 +175,14 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
     # Organaize and retrieve lowest p-value genes
     degs <- df %>%
 
-      # Filter non significant genes
+      # Filter for only the genes that are wanted
       dplyr::filter(Geneid %in% degsLabel)
 
     # Put labels in the plot
     p <- p + geom_text_repel(data = degs, mapping = aes(x = log2FoldChange, y = -log10(padj), label = Geneid), size = degsLabelSize, color = "Black")
 
   }
+
   # Draw the graph.
   return(p)
 
