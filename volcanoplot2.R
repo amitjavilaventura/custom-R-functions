@@ -31,7 +31,7 @@
 #' @param pointColor Character of length 3. Colors of the downregulated, notDE and upregulated points. Default: c("darkgreen", "gray", "red")
 #' @param legendTitle Logical. If FALSE, the title of the legend is not plotted. Default: FALSE.
 #' @param legendPos Character. Position of the legend. One of: "bottom", "top", "right", "left", "none". Default: "bottom".
-#' @param degsLabel Logical or character. If TRUE, the genes with highest log2FC in absolute are labelled. If character, it has to contain the names of the genes that are wanted to appear in the plot. Default: FALSE.
+#' @param degsLabel Logical or character. If TRUE, the number genes (defined in 'degsLabelNum') with highest log2FC in absolute are labelled. If character, it has to contain the names of the genes that are wanted to appear in the plot. Default: FALSE.
 #' @param degsLabelNum Numerical. Number of most expressed genes to label in the plot. The double of this number will be labelled (once for DEGs with lowest p-value and once for the DEGs with highest log2fFC in absolute value). Default: 5.
 #' @param degsLabelSize Numerical. Size of the labels of the DEGs Default: 3.
 #' @param ggrastr Logical. If TRUE, the points of the volcano plot are drawn with geom_points_rast instead of geom_point. Default: FALSE.
@@ -54,6 +54,12 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
 
 
   df <- df %>%
+
+    # Mutate the data frame to convert NA in padj to 1
+    dplyr::mutate(padj = ifelse(test = is.na(padj), yes = 1, no = padj)) %>%
+
+    # Mutate the data frame to convert NA in log2FoldChange to 0
+    dplyr::mutate(log2FoldChange = ifelse(test = is.na(log2FoldChange), yes = 0, no = log2FoldChange)) %>%
 
     # Mutate the dataframe to convert NA in DEG to "NS".
     dplyr::mutate(DEG = ifelse(test = is.na(DEG), yes = "NS", no = DEG)) %>%
@@ -147,6 +153,8 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
   # Write names of the most DE genes in terms of lowest adjusted p-value
   if(is.logical(degsLabel)){
 
+    print("'degsLabel' is logical")
+
     if(degsLabel) {
 
       # Load ggrepel
@@ -168,6 +176,8 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
       p <- p + geom_text_repel(data = degs, mapping = aes(x = log2FoldChange, y = -log10(padj), label = Geneid), size = degsLabelSize, color = "Black")
     }
   } else if(is.character(degsLabel)){
+
+    print("'degsLabel' is character, so the insterted genes will be printted on the plot")
 
     # Load ggrepel
     require(ggrepel)
