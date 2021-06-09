@@ -57,10 +57,14 @@ source(here("R/upset_overlap_peaks.R"))
 # ----- FindDeNovoTargets ----- #
 source(here("R/findDeNovoTargets.R"))
 
-
 # ----- Setdiff ----- #
 # Functions from dfernandezperez to find unions and intersections of names
 source(here("R/setDiff.R"))
+
+
+# ----- Ggplot Helpers ----- #
+# Functions to use with ggplot2 and customize the plots easily
+source(here("R/ggplot_helpers.R"))
 
 # ----- GOenrichment ----- #
 # A function that does enrichGO

@@ -153,9 +153,9 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
   # Write names of the most DE genes in terms of lowest adjusted p-value
   if(is.logical(degsLabel)){
 
-    print("'degsLabel' is logical")
+    print("'degsLabel' is logical. If TRUE, the most significant DEGs will be printed on thee plot.")
 
-    if(degsLabel) {
+    if(degsLabel){
 
       # Load ggrepel
       require(ggrepel)
@@ -170,14 +170,15 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
         dplyr::arrange(padj)
 
       # Create a dataframe with the labels of the DEGs with highest abs(log2FC).
-      degs <- head(na.omit(degs),degsLabelNum) %>% as.data.frame()
+      degs <- head(na.omit(degs), degsLabelNum) %>% as.data.frame()
 
       # Put labels in the plot
       p <- p + geom_text_repel(data = degs, mapping = aes(x = log2FoldChange, y = -log10(padj), label = Geneid), size = degsLabelSize, color = "Black")
     }
+
   } else if(is.character(degsLabel)){
 
-    print("'degsLabel' is character, so the insterted genes will be printted on the plot")
+    print("'degsLabel' is character, so the written genes will be printed on the plot")
 
     # Load ggrepel
     require(ggrepel)
