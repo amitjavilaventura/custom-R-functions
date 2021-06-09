@@ -47,15 +47,3 @@ calc_boxplot_stat <- function(x) {
 stat_sum_boxplot <- function( size = .5, width = .5){
   stat_summary(fun.data = calc_boxplot_stat, geom="boxplot", size = size, width = size)
 }
-
-df %>%
-  ggplot(aes(timepoint, log2(value), color=timepoint)) +
-  stat_sum_boxplot() +
-  facet_wrap(~signature) +
-  ggpubr::stat_compare_means(method = "wilcox.test", comparisons = list(c(3,1), c(2,1), c(3,2)), paired = T, label = "p.format", label.y = c(11,10,9)) +
-
-  theme_custom() +
-
-  ggtitle("Mean expression of NAIVE, FORMATIVE and COMMITTED genes", "WT; 0h, 48h, 96h") +
-  ylab("Mean expression")
-
