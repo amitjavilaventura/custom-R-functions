@@ -153,7 +153,7 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
   # Write names of the most DE genes in terms of lowest adjusted p-value
   if(is.logical(degsLabel)){
 
-    print("'degsLabel' is logical. If TRUE, the most significant DEGs will be printed on thee plot.")
+    message("'degsLabel' is logical. If TRUE, the most significant DEGs will be printed on thee plot.")
 
     if(degsLabel){
 
@@ -178,7 +178,7 @@ volcanoPlot2 <- function(df, xlim = c(-10,10), ylim = c(0,30),
 
   } else if(is.character(degsLabel)){
 
-    print("'degsLabel' is character, so the written genes will be printed on the plot")
+    message("'degsLabel' is character, so the written genes will be printed on the plot")
 
     # Load ggrepel
     require(ggrepel)
