@@ -16,7 +16,7 @@ theme_custom <- function(legend = "none", x.text.angle = 0, margin = T, base_siz
 ## calc_boxplot_stat() ----------------------------------------------------------------------------
 ## Function to use with ggplot2::stat_summary() to build boxplots
 ##  stat_summary(fun.data = calc_boxplot_stat, geom="boxplot", size = 0.8, width = .8)
-calc_boxplot_stat <- function(x) {
+calc_boxplot_stat <- function(x){
 
   # coef for the outliers
   coef <- 1.5
@@ -42,8 +42,27 @@ calc_boxplot_stat <- function(x) {
 
 }
 
+
+
 ## stat_sum_boxplot() -----------------------------------------------------------------------------
 ## Function to plot boxplots wihtout oultliers by calling stat_summary(fun.data = calc_boxplot_stat, geom="boxplot", size = 0.8, width = .8)
 stat_sum_boxplot <- function( size = .5, width = .5){
   stat_summary(fun.data = calc_boxplot_stat, geom="boxplot", size = size, width = size)
+}
+
+
+## calc_n() ---------------------------------------------------------------------------------------
+calc_n_boxplot <- function(x){
+
+  x <- x %>% na.omit()
+  n <- c(y = mean(fivenum(x)[3:4]), label = length(x))
+
+  return(n)
+
+}
+
+## stat_sum_n() -----------------------------------------------------------------------------------
+## Functiion to write the number of observations in the boxplots
+stat_sum_n_boxplot <- function(text_size = 2, text_color = "black"){
+  stat_summary(fun.data = calc_n_boxplot, geom = "text", size = text_size, color = text_color)
 }
