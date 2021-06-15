@@ -1,13 +1,12 @@
-
-# UpDownBars()
+# barDEGs()
 # ===============================================
 
-#' @title UpDownBars
+#' @title barDEGs
 #' @author amitjavilaventura
 #'
 #' It takes a named list with the DE data of different contrasts and draws an horizontal barplot with the up (right) and downregulated (left) genes.
 #'
-#' @usage updown_bars(deg_list, deg_names = names(deg_list), name_pos = "min", xlim = NULL, xaxis = F, yaxis = F, colors = c("green", "red"), alpha = 0.5)
+#' @usage barDEGs(deg_list, deg_names = names(deg_list), name_pos = "min", xlim = NULL, xaxis = F, yaxis = F, colors = c("green", "red"), alpha = 0.5)
 #'
 #' @returns A ggplot2-based barplot with the upregulated and downregulated genes in each contrast.
 #'
@@ -15,13 +14,14 @@
 #' @param deg_names Character vector of equal length to 'deg_list' names of the elements in 'deg_list'. Default: names(deg_list)
 #' @param name_pos Character of length 1. Where to write the name of each contrast. One of c('min', 'left', 'right', 'none'). If 'min', the name of the contrast will be written at the side where there are less DE genes; if 'right', the name of the contrast will be written to the right side of the plot; if 'left', the name of the contrast will be written to the left side of the plot; if 'none' the name of the contrast won't be written. Default: 'min'.
 #' @param xlim Numeric of length 2 or NULL. The limits of the X axis. If NULL, the limits of the X axis are the default. Useful when 'name_pos' is 'left' or 'right'. Default: NULL
+#' @param position_num Numeric of length 1. The position of the number of DEGs in each bar and the position of the contrast label. Default = 10.
 #' @param xaxis Logical of length 1. Whether to draw the text of the X axis (number of DE) or not. Default: FALSE.
 #' @param yaxis Logical of length 1. Whether to draw the text of the Y axis (contrast names) or not. Default: FALSE.
 #' @param colors Character of length 2. Colors for the downregulated and upregulated genes. Default: c("green", "red")
-#' @param alpha Numeric of length 1. Alpha (transparency) value for the vars. Deefault: 0.5
+#' @param alpha Numeric of length 1. Alpha (transparency) value for the vars. Default: 0.5
 
 barDEGs <- function(deg_list, deg_names = names(deg_list),
-                    name_pos = "min", xlim = NULL,
+                    name_pos = "min", xlim = NULL, position_num = 10,
                     xaxis = F, yaxis = F,
                     colors = c("green", "red"), alpha = 0.5){
 
@@ -54,10 +54,10 @@ barDEGs <- function(deg_list, deg_names = names(deg_list),
     # Change the number of downregulated genes to negative
     mutate(number = if_else(DEG == "Downregulated", -n, n)) %>%
     # Add a variable for the position of the number of DEGs and the hjust
-    mutate(pos_num   = if_else(DEG == "Downregulated", -10, 10)) %>%
+    mutate(pos_num   = if_else(DEG == "Downregulated", -position_num, position_num)) %>%
     mutate(hjust_num = if_else(DEG == "Downregulated", 1, 0)) %>%
     # Add a variable for the position of the name of the contrast
-    mutate(contrast_pos = if_else(DEG == "Downregulated", number-10, number+10))
+    mutate(contrast_pos = if_else(DEG == "Downregulated", number-position_num, number+position_num))
 
   # Set at which site will the contrast name be written
   if(name_pos == "min"){
