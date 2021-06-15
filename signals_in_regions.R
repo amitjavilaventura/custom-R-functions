@@ -182,5 +182,84 @@ signals_in_regions <- function(bigwigs, regions,
 
 }
 
-#### some function to boxplot
-#### some function to heatmap
+
+
+#### BETTER FUNCTIONS MADE BY DFERNANDEZPEREZ AND ADAPTED BY ME -----
+# COMPUTE ONE COVEARGE IN A LIST OF REGIONS
+computeOneCoverage <- function(bw, regions, operation = "mean") {
+
+  require(megadepth)
+  require(purrr)
+  require(dplyr)
+
+  oneCoverage <- regions %>%
+    purrr::map(~ get_coverage(bigwig_file = bw, op = operation, annotation = .x) ) %>%
+    purrr::imap(~ mutate(.x, group = .y)) %>%
+    purrr::map_dfr(as.data.frame)
+
+  return(oneCoverage)
+}
+
+# COMPUTE SEVEERAL COVERAGES IN A LIST OF REGIONS
+computeCoverages <- function(bigwigs, regions,
+                             bw_names = names(bigwigs), bw_order = bw_names,
+                             region_names = names(regions), regions_order = bed_names,
+                             operation = "mean", bind_rows = T){
+
+  # Load packages
+  require(megadepth)
+  require(dplyr)
+  require(purrr)
+  require(magrittr)
+
+  # Check if inputs are OK
+  if(!class(bigwigs) %in% c("character", "list")){ stop("'bigwigs' must be a character vector or a named list with the path to each BIGWIG.") }
+  else if(!class(regions) %in% c("character", "list")){ stop("'regions' must be a character vector or a named list with the paths to each BED. Altenatively it can be a list of data frames with the first 3 columns being the genomic coordinates: 'seqnames', 'start' and 'end'.")}
+  else if(is.null(bw_names) | is.null(region_names)){ stop("'bw_names' and 'region_names' must be not NULL character vectors.") }
+  else if(length(bigwigs) != length(bw_names)){ stop("'bigwigs' and 'bw_names' must have the same length.") }
+  else if(length(regions) != length(region_names)){ stop("'regions' and 'region_names' must have the same length.") }
+
+  # Initialize tempororary variable to FALSE
+  is_temporary <- FALSE
+
+  # Write temporary files in case 'regions' is a list of dataframes.
+  if(is.list(regions) & all(regions %>% purrr::map(~is.data.frame(.x)) %>% unlist())){
+
+    # Stablish temporary variable to TRUE
+    is_temporary <- TRUE
+
+    # Create temporary directory
+    temp_dir <- tempdir(check = T)
+
+    # Write temporary files iteratively
+    for(i in 1:length(regions)){
+      name <- paste(region_names[i], "_temp", sep = "")
+      temporary <- tempfile(pattern = name, tmpdir = temp_dir, fileext = ".bed")
+      regions[[i]] %>% write.table(file = temporary, quote = F, sep = "\t", row.names = F, col.names = F)
+    }
+
+    # List the path of the temporary files
+    regions <- list.files(path = temp_dir, pattern = ".bed", full.names = T, recursive = T)
+  }
+
+  ## Name the bigwig and the regions vector/list and convert them to a list
+  bigwigs <- bigwigs %>% as.list() %>% purrr::set_names(nm = bw_names)
+  regions <- regions %>% as.list() %>% purrr::set_names(nm = region_names)
+
+  # Compute coverages by calling computeOneCoverage() inside purrr::map
+  coverages <- bigwigs %>%
+    purrr::map(computeOneCoverage, regions, operation) %>%
+    purrr::imap(~dplyr::mutate(.x, sample = .y))
+
+  if(bind_rows){ coverages <- coverages %>% dplyr::bind_rows() %>% dplyr::select(seqnames, start, end, score, "region" = group, sample) }
+
+  # Remove tempfiles in tempdir
+  if(is_temporary){
+    file.remove(regions)
+    if(any(file.exists(regions))){ print("At least one temporary file has not been removed") }
+  }
+
+  return(coverages)
+}
+
+
