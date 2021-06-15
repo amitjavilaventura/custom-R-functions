@@ -18,6 +18,10 @@ source(here("R/pcaplot2.R"))
 # A function to draw volcano plots
 source(here("R/volcanoplot2.R"))
 
+# ----- barDEGs ----- #
+# A function to barplots with up and down regulated genes
+source(here("R/barDEGs"))
+
 
 # ----- pieAnno3 ----- #
 # pieAnno -> A function to draw pie charts with the peaks divided by promoter, gene body (UTRs, introns, exons) and distal (distal intergeninc, downstream).
