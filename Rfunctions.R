@@ -20,7 +20,7 @@ source(here("R/volcanoplot2.R"))
 
 # ----- barDEGs ----- #
 # A function to barplots with up and down regulated genes
-source(here("R/barDEGs"))
+source(here("R/barDEGs.R"))
 
 
 # ----- pieAnno3 ----- #
