@@ -170,8 +170,7 @@ overlap_peaks <- function(peaks1, peaks2, names = c("Peaks1", "Peaks2"),
 # ----- overlap_peaks ----- #
 # author: amitjavilaventura
 # funtion that overlaps two sets of peaks and returns common and unique peaks (uses plyranges filter_by_overlaps and filter_by_non_overlaps)
-overlap_peaks2 <- function(peak_list, Names = names(peak_list),
-                           write_files = F, out_dir = ".", out_format = ".bed", colnames = F){
+overlap_peaks2 <- function(peak_list, Names = names(peak_list)){
 
   require(dplyr)
   require(plyranges)
@@ -190,16 +189,6 @@ overlap_peaks2 <- function(peak_list, Names = names(peak_list),
 
   overlaps <- list(common, peaks1_unique, peaks2_unique)
   overlaps <- overlaps %>% set_names(nm = c("Common", Names[1], Names[2]))
-
-  if(write_files){
-
-    dir.create(path = out_dir, showWarnings = F, recursive = T)
-
-    write.table(x = common, file = paste0(out_dir, "/", paste(Names[1], Names[2], "common", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
-    write.table(x = peaks1_unique, file = paste0(out_dir, "/", paste(Names[1], "unique", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
-    write.table(x = peaks2_unique, file = paste0(out_dir, "/", paste(Names[2], "unique", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
-
-  }
 
   return(overlaps)
 

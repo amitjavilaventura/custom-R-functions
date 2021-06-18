@@ -203,7 +203,7 @@ computeOneCoverage <- function(bw, regions, operation = "mean") {
 # COMPUTE SEVEERAL COVERAGES IN A LIST OF REGIONS
 computeCoverages <- function(bigwigs, regions,
                              bw_names = names(bigwigs), bw_order = bw_names,
-                             region_names = names(regions), regions_order = bed_names,
+                             region_names = names(regions), regions_order = region_names,
                              operation = "mean", bind_rows = T){
 
   # Load packages
@@ -255,8 +255,8 @@ computeCoverages <- function(bigwigs, regions,
 
   # Remove tempfiles in tempdir
   if(is_temporary){
-    file.remove(regions)
-    if(any(file.exists(regions))){ print("At least one temporary file has not been removed") }
+    file.remove(regions %>% unlist())
+    if(any(file.exists(regions %>% unlist()))){ warning("At least one temporary file has not been removed") }
   }
 
   return(coverages)
