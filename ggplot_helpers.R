@@ -47,9 +47,9 @@ calc_boxplot_stat <- function(x){
 ## stat_sum_boxplot() -----------------------------------------------------------------------------
 ## Function to plot boxplots wihtout oultliers by calling stat_summary(fun.data = calc_boxplot_stat, geom="boxplot", size = 0.8, width = .8)
 stat_sum_boxplot <- function( size = .5, width = .5){
-  stat_summary(fun.data = calc_boxplot_stat, geom="boxplot", size = size, width = size, position = "dodge")
+  stat_summary(fun.data = calc_boxplot_stat, geom="boxplot", size = size, width = width,
+               position = position_dodge(width = width))
 }
-
 
 ## calc_n() ---------------------------------------------------------------------------------------
 calc_n_boxplot <- function(x){
@@ -61,8 +61,10 @@ calc_n_boxplot <- function(x){
 
 }
 
+
 ## stat_sum_n() -----------------------------------------------------------------------------------
 ## Functiion to write the number of observations in the boxplots
-stat_sum_n_boxplot <- function(text_size = 2, text_color = "black"){
-  stat_summary(fun.data = calc_n_boxplot, geom = "text", size = text_size, color = text_color)
+stat_sum_n_boxplot <- function(text_size = 2, text_color = "black", width = .5){
+  stat_summary(fun.data = calc_n_boxplot, geom = "text", size = text_size, color = text_color,
+               position = position_dodge(width = width))
 }

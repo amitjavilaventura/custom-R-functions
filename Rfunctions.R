@@ -58,6 +58,9 @@ source(here("R/signals_in_regions.R"))
 # upset_overlap_peaks() --> computes the overlaps with different sets of peaks using ChIPpeakAnno::makeVennDiagram() and draws a UpSet plot using UpSetR::upset()
 source(here("R/upset_overlap_peaks.R"))
 
+# ----- ggVennPeaks() ----- #
+source(here("R/ggVennPeaks.R"))
+
 # ----- FindDeNovoTargets ----- #
 source(here("R/findDeNovoTargets.R"))
 
