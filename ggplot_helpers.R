@@ -68,3 +68,23 @@ stat_sum_n_boxplot <- function(text_size = 2, text_color = "black", width = .5){
   stat_summary(fun.data = calc_n_boxplot, geom = "text", size = text_size, color = text_color,
                position = position_dodge(width = width))
 }
+
+
+
+## calc_n() ---------------------------------------------------------------------------------------
+calc_mean_boxplot <- function(x){
+
+  x <- x %>% na.omit()
+  n <- c(y = mean(fivenum(x)[2:3]), label = round(mean(x), digits = 2))
+
+  return(n)
+
+}
+
+
+## stat_sum_n() -----------------------------------------------------------------------------------
+## Functiion to write the number of observations in the boxplots
+stat_sum_mean_boxplot <- function(text_size = 2, text_color = "black", width = .5){
+  stat_summary(fun.data = calc_mean_boxplot, geom = "text", size = text_size, color = text_color,
+               position = position_dodge(width = width))
+}
