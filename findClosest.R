@@ -67,7 +67,9 @@ findClosest <- function(x, y, k = 2, y_id = "V4"){
 #' @param k Numeric of length 1. Integer number showing the number of nearest features in `y` to search for each element in `x`. Default: 2
 #' @param y_cols Character of length 6. The names of the columns in `y` to add to `x`. These columns must contain, in this order: seqnames, start, end, width, ID and strand
 #'
-findClosestCoords <- function(x, y, k = 2, y_cols = c("seqnames", "start", "end", "width", "V4","strand")){
+findClosestCoords <- function(x, y, k = 1,
+                              x_cols = c("seqnames", "start", "end", "width", "V4","strand", "annotation"),
+                              y_cols = c("seqnames", "start", "end", "width", "V4","strand")){
 
   # Load required packages
   require(plyranges)
@@ -99,53 +101,35 @@ findClosestCoords <- function(x, y, k = 2, y_cols = c("seqnames", "start", "end"
   else if(is.data.frame(y)){  y <- as_granges(y) }
 
   # Search nearest neighbor elements
-  nearest <- nearestKNeighbors(x = x, subject = y, k=k) %>%
-
-    # Remove warnings
-    pkgcond::suppress_warnings()
-
-  # Take number of rows in the `x` object
-  n_rows <- length(nearest)
+  nearest  <- nearestKNeighbors(x = x, subject = y, k=k) %>% pkgcond::suppress_warnings()
 
   # Re convert x and y to tibble
-  x <- x %>% as_tibble()
-  y <- y %>% as_tibble()
+  x <- x %>% as_tibble() %>% dplyr::select(x_cols)
+  y <- y %>% as_tibble() %>% dplyr::select(y_cols)
 
-  ### This step could be done without nesting and unnesting, just create the list.
-  ### But I leave it like this in case I find a way to do all the code with purrr and not for loops.
-  # Build a nested list with n_rows number of lists
-  closest <- rep(list(list("chr" = character(1), "start" = numeric(1), "end" = numeric(1), width = numeric(1),
-                           "id" = character(1), "strand" = character(1))), times = n_rows) %>%
+  nearest_list <- nearest %>%
+    as.list() %>%
+    purrr::map(~matrix(.x, ncol = k)) %>%
+    purrr::map(~magrittr::set_colnames(.x, paste("k",1:k, sep = ""))) %>%
+    do.call(rbind, .)
 
-    # Create a tibble column with the nested list
-    tibble(k = .) %>%
+  nearest_list <- split(nearest_list, rep(1:ncol(nearest_list), each = nrow(nearest_list))) %>%
+    purrr::set_names(paste("k",1:k, sep = "")) %>%
+    purrr::map(~tibble(index_y = .x)) %>%
+    purrr::map(~dplyr::mutate(.x, index_x = row_number()))
 
-    # Unnest the nested list to the wide format.
-    tidyr::unnest_wider(col = k, names_sep = "_")
-
-
-  # For each element nearest feature
-  for(i in 1:k){
-
-    # Change the colnames of the closest tibble to have the number of the ith closest feature.
-    col_names <- names(closest) %>% gsub("k", paste("k", i, sep = ""), .)
-    closest_k <- closest %>% set_colnames(value = col_names)
-
-    # For each rew in 'x'
-    for(j in 1:length(nearest)){
-
-      # Take the corresponding columns in y for the ith closest observation in the jth column of x.
-      # Append the values to each jth row of the closest_k tibble
-      closest_k[j, ] <- y[nearest[[j]][i], y_cols]
-
-    }
-
-    # Bind the columns of the closest_k tibble to x
-    x <- x %>% bind_cols(closest_k)
+  # Print only the nearest peaks from y in the same order as x
+  x_nearest_list <- list()
+  for(i in 1:length(nearest_list)){
+    y_list <- y[nearest_list[[i]]$index_y %>% na.omit(),]
+    x_filt <- bind_cols(x, nearest_list[[i]]) %>% dplyr::filter(!is.na(index_y)) %>% dplyr::select(-contains("index"))
+    x_nearest_list[[paste("k",i, sep = "")]] <- bind_cols(x_filt, y_list) %>%
+      magrittr::set_colnames(c(paste(x_cols, "x", sep = "_"), paste(y_cols, "y", sep = "_")))
+      pkgcond::suppress_warnings() %>% pkgcond::suppress_messages()
   }
 
   # Return x
-  return(x)
+  return(x_nearest_list)
 
 }
 
