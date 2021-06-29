@@ -48,7 +48,7 @@ calc_boxplot_stat <- function(x){
 ## Function to plot boxplots wihtout oultliers by calling stat_summary(fun.data = calc_boxplot_stat, geom="boxplot", size = 0.8, width = .8)
 stat_sum_boxplot <- function( size = .5, width = .5){
   stat_summary(fun.data = calc_boxplot_stat, geom="boxplot", size = size, width = width,
-               position = position_dodge(width = width))
+               position = position_dodge(width = width), stat = "identity")
 }
 
 ## calc_n() ---------------------------------------------------------------------------------------
