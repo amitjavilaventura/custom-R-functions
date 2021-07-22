@@ -214,39 +214,16 @@ overlap_bases <- function(peaks1, peaks2, names = c("Peaks1", "Peaks2")){
   require(dplyr)
   require(plyranges)
 
-  granges1 <- peaks1[,1:6] %>% as_granges()
-  granges2 <- peaks2[,1:6] %>% as_granges()
+  granges1 <- peaks1 %>% as_granges()
+  granges2 <- peaks2 %>% as_granges()
 
   intersect <- join_overlap_intersect(granges1, granges2) %>% as_tibble()
 
   sum_bases   <- intersect$width %>% sum()    # sum of all overlapping bases
   mean_bases  <- intersect$width %>% mean()   # mean of all overlapping bases respect the number of overlaps found
-  perc_bases1 <- sum_bases/sum(granges1@ranges@width)*100 # percentage of overlapping bases respect to the total number of bases in peaks1
-  perc_bases2 <- sum_bases/sum(granges2@ranges@width)*100 # percentage of overlapping bases respect to the total number of bases in peaks2
-
-
-  rel_perc_bases1 <- granges1 %>%
-    filter(V4 %in% intersect$V4.x) %>%
-    as_tibble() %>%
-    dplyr::mutate(overlap_bases = intersect$width, percent_overlap = overlap_bases/width*100) %>%
-    pull(percent_overlap)
-
-  rel_perc_bases2 <- granges2 %>%
-    filter(V4 %in% intersect$V4.y) %>%
-    as_tibble() %>%
-    dplyr::mutate(overlap_bases = intersect$width, percent_overlap = overlap_bases/width*100) %>%
-    pull(percent_overlap)
-
-  rel_mean_perc1 <- rel_perc_bases1 %>% mean()
-  rel_mean_perc2 <- rel_perc_bases2 %>% mean()
 
   to_return <- list("Intersection_df" = intersect,
-                    "Overlapping_bases" = sum_bases,
-                    "Mean_bases" = mean_bases,
-                    "Percent_1" = perc_bases1,
-                    "Percent_2" = perc_bases2,
-                    "Rel_percent1" = rel_perc_bases1,
-                    "Rel_percent2" = rel_perc_bases2)
+                    "Overlapping_bases" = sum_bases)
 
   return(to_return)
 }
