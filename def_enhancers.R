@@ -307,11 +307,11 @@ def_enhancers_k4me3_signal <- function(k4me1_distal, k27ac_distal, k27me3_distal
       quantiles_promo  <- k4me3_coverage_promo$score %>% quantile()
       quantiles_distal <- k4me3_coverage_distal$score %>% quantile()
 
-      if(filter_by_promo_score == c("min", "q0")) { k4me3_distal_out <- k4me3_coverage_distal %>% as_tibble() %>% dplyr::filter(score >= quantiles_promo[1]) }
+      if(filter_by_promo_score %in% c("min", "q0")) { k4me3_distal_out <- k4me3_coverage_distal %>% as_tibble() %>% dplyr::filter(score >= quantiles_promo[1]) }
       else if(filter_by_promo_score == "q1") { k4me3_distal_filt <- k4me3_distal_out %>% as_tibble() %>% dplyr::filter(score >= quantiles_promo[2]) }
       else if(filter_by_promo_score %in% c("median", "q2")) { k4me3_distal_out <- k4me3_coverage_distal %>% as_tibble() %>% dplyr::filter(score >= quantiles_promo[3]) }
       else if(filter_by_promo_score == "q3") { k4me3_distal_filt <- k4me3_distal_out %>% as_tibble() %>% dplyr::filter(score >= quantiles_promo[4]) }
-      else if(filter_by_promo_score == c("max", "q4")) { k4me3_distal_out <- k4me3_coverage_distal %>% as_tibble() %>% dplyr::filter(score >= quantiles_promo[5]) }
+      else if(filter_by_promo_score %in% c("max", "q4")) { k4me3_distal_out <- k4me3_coverage_distal %>% as_tibble() %>% dplyr::filter(score >= quantiles_promo[5]) }
     }
 
     # distal peaks with higher score than percentile x in promo peaks
