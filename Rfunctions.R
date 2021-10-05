@@ -6,35 +6,15 @@
 # I use here, because it sets the working directory in the current project directory where I have the folder R with the Rfunctions.R and other scripts
 if(!require(here)){ install.packages("here") }; library(here)
 
-# ----- chromReads ----- #
-# To count and plot the reads mapped in each chromosome
-source(here::here("R/chromReads.R"))
-
 # ----- pcaplot2 ----- #
 # A function to plot the principal components analysis
 source(here::here("R/pcaplot2.R"))
-
-# ----- volcanoplot2 ----- #
-# A function to draw volcano plots
-source(here::here("R/volcanoplot2.R"))
-
-# ----- barDEGs ----- #
-# A function to barplots with up and down regulated genes
-source(here::here("R/barDEGs.R"))
-
 
 # ----- pieAnno3 ----- #
 # pieAnno -> A function to draw pie charts with the peaks divided by promoter, gene body (UTRs, introns, exons) and distal (distal intergeninc, downstream).
 # filterAnno -> A function that takes the output of Annotate peak and changes the features to promoter or distal.
 source(here::here("R/pieAnno.R"))
 
-# ----- barAnno ----- #
-# barAnno -> a function to draw barplots from a list of annotatePeak objects. Can divide peaks in promoter/distal or promoter/gene body/distal
-source(here::here("R/barAnno.R"))
-
-# ----- vennDiagram2 ----- #
-# vennDiagram2 -> a function to draw venn diagarams from two GenomicRanges objects.
-source(here::here("R/vennDiagram2.R"))
 
 # ----- read_delim_empty ----- #
 # read_delim_empty -> a read.delim()-based function that can read empty files.
@@ -45,21 +25,12 @@ source(here::here("R/read_delim_empty.R"))
 # def_enhancers_no_k4me3
 source(here::here("R/def_enhancers.R"))
 
-# ----- DEcompare ----- #
-# DEcompare() -> compares log2FC of two different differential expression datasets (output from dfernandezperez's RNAseq pipeline)
-source(here::here("R/DEcompare.R"))
 
 
 # ----- Signals in regions ----- #
 # function(s) that take a bigwig(s) and a bed(s) and compute the signal in the desired regions
 source(here::here("R/signals_in_regions.R"))
 
-# ----- Upset overlap peaks ----- #
-# upset_overlap_peaks() --> computes the overlaps with different sets of peaks using ChIPpeakAnno::makeVennDiagram() and draws a UpSet plot using UpSetR::upset()
-source(here::here("R/upset_overlap_peaks.R"))
-
-# ----- ggVennPeaks() ----- #
-source(here::here("R/ggVennPeaks.R"))
 
 # ----- FindDeNovoTargets ----- #
 source(here::here("R/findDeNovoTargets.R"))
@@ -129,102 +100,5 @@ chip_stats <- function(df, conditions = NULL){
 
   return(stats)
 
-}
-
-# ----- overlap_peaks ----- #
-# author: amitjavilaventura
-# funtion that overlaps two sets of peaks and returns common and unique peaks (uses plyranges filter_by_overlaps and filter_by_non_overlaps)
-overlap_peaks <- function(peaks1, peaks2, names = c("Peaks1", "Peaks2"),
-                          write_files = F, out_dir = "", out_format = ".tsv", colnames = T){
-
-  require(dplyr)
-  require(plyranges)
-  require(purrr)
-
-  common <- filter_by_overlaps(x = peaks1 %>% as_granges(), y = peaks2 %>% as_granges()) %>%
-    as.data.frame()
-
-  peaks1_unique <- filter_by_non_overlaps(x = peaks1 %>% as_granges(), y = peaks2 %>% as_granges()) %>%
-    as.data.frame()
-
-  peaks2_unique <- filter_by_non_overlaps(x = peaks2 %>% as_granges(), y = peaks1 %>% as_granges()) %>%
-    as.data.frame()
-
-  list <- list("common" = common,
-               "peaks1" = peaks1_unique,
-               "peaks2" = peaks2_unique) %>%
-
-    set_names(c("Common", names))
-
-  if(write_files){
-
-    dir.create(path = out_dir, showWarnings = F, recursive = T)
-
-    write.table(x = list[["common"]], file = paste(out_dir, "/", paste(names[1], names[2], "common", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
-    write.table(x = list[["peaks1"]], file = paste(out_dir, "/", paste(names[1], "unique", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
-    write.table(x = list[["peaks2"]], file = paste(out_dir, "/", paste(names[2], "unique", sep = "_"), out_format, sep = ""), sep = "\t", quote = F, row.names = F, col.names = colnames)
-
-  } else{
-    return(list)
-  }
-
-}
-
-# ----- overlap_peaks ----- #
-# author: amitjavilaventura
-# funtion that overlaps two sets of peaks and returns common and unique peaks (uses plyranges filter_by_overlaps and filter_by_non_overlaps)
-overlap_peaks2 <- function(peak_list, Names = names(peak_list), write_files = F, out_format = "", colnames = F,
-                           out_dir = ""){
-
-  require(dplyr)
-  require(plyranges)
-  require(purrr)
-
-  if(length(peak_list) != 2){ stop("'peak_list' must have two sets of peaks") }
-
-  common <- filter_by_overlaps(x = peak_list[[1]] %>% as_granges(), y = peak_list[[2]] %>% as_granges()) %>%
-    as.data.frame()
-
-  peaks1_unique <- filter_by_non_overlaps(x = peak_list[[1]] %>% as_granges(), y = peak_list[[2]] %>% as_granges()) %>%
-    as.data.frame()
-
-  peaks2_unique <- filter_by_non_overlaps(x = peak_list[[2]] %>% as_granges(), y = peak_list[[1]] %>% as_granges()) %>%
-    as.data.frame()
-
-  overlaps <- list(common, peaks1_unique, peaks2_unique)
-  overlaps <- overlaps %>% set_names(nm = c("Common", Names[1], Names[2]))
-
-
-  if(write){
-    common %>% write.table(., file = paste(out_dir,"/", paste(Names, collapse = "_"), "_common", out_format, sep = ""))
-    peaks1_unique %>% write.table(., file = paste(out_dir,"/", Names[1], "_unique", out_format, sep = ""))
-    peaks2_unique %>% write.table(., file = paste(out_dir,"/", Names[2], "_unique", out_format, sep = ""))
-  }
-
-  return(overlaps)
-
-}
-
-
-# ----- overlapping_bases ----- #
-# author: amitjavilaventura
-# function that overlaps two sets of peaks and returns the number of bases overlapping
-overlap_bases <- function(peaks1, peaks2, names = c("Peaks1", "Peaks2")){
-
-  require(dplyr)
-  require(plyranges)
-
-  granges1 <- peaks1 %>% as_granges()
-  granges2 <- peaks2 %>% as_granges()
-
-  intersect <- join_overlap_intersect(granges1, granges2) %>% as_tibble()
-
-  sum_bases   <- intersect$width %>% sum()    # sum of all overlapping bases
-  mean_bases  <- intersect$width %>% mean()   # mean of all overlapping bases respect the number of overlaps found
-
-  to_return <- list("Intersection_df" = intersect,
-                    "Overlapping_bases" = sum_bases)
-
-  return(to_return)
 }
 
