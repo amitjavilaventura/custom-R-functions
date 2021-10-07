@@ -1,6 +1,8 @@
-# Rfunctions
+# R functions
 
 R custom functions that are useful for different omics analyses.
+
+If you use one of these functions, please, mention me and give a star to this repository.
 
 ## TO DOs
 
@@ -11,9 +13,6 @@ Functions and packages to consider:
 * `forcats::`: `fct_reorder()`, `fct_relevel()`, `fct_rev()`
 
 
-* `GenomicRanges::`: 
-    
-    + `distance()`: I pretend to do a function which finds the closest and 2nd, 3rd... closest features (e.g. TSSs, promoters...) to a set of peaks (e.g. ChIP-seq distal peaks)
 
 ## `Rfunctions.R`
 
