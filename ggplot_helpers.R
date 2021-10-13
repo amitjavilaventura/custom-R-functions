@@ -4,14 +4,22 @@
 
 ## theme_custom() ---------------------------------------------------------------------------------
 ## Custom theme for ggplot2-based plots, based on ggpubr::theme_pubr()
-theme_custom <- function(legend = "none", margin = T, base_size = 12, border = T, x.text.angle = 0, x.text.hjust = .5, x.text.vjust = .5){
+theme_custom <- function(legend = "none", margin = T, base_size = 12, border = T,
+                        x.text.angle = 0, x.text.hjust = .5, x.text.vjust = .5,
+                        title.hjust = .5, title.face = "bold", subtitle.face = "italic",
+                        title.family = "sans", subtitle.family = "sans",
+                        caption.face = "plain", caption.hjust = 1, caption.family = "sans",
+                        axis.title.face = "bold", axis.title.familiy = "sans",
+                        axis.text.family = "sans", axis.text.size = 10){
 
   theme_pubr(legend = legend, border = border, margin = margin, base_size = base_size) +
-    theme(plot.title = element_text(face = "bold"),
-          plot.subtitle = element_text(face = "italic"),
-          axis.title = element_text(face = "bold"),
+    theme(plot.title = element_text(face = title.face, hjust = title.hjust, family = title.family),
+          plot.subtitle = element_text(face = subtitle.face, hjust = title.hjust, family = subtitle.family),
+          axis.title = element_text(face = axis.title.face, family = axis.title.familiy),
           legend.title = element_blank(),
-          axis.text.x = element_text(angle = x.text.angle, hjust = x.text.hjust, vjust = x.text.vjust))
+          axis.text.x = element_text(angle = x.text.angle, hjust = x.text.hjust, vjust = x.text.vjust),
+          axis.text   = element_text(family = axis.text.family, size = axis.text.size),
+          plot.caption = element_text(face = caption.face, hjust = caption.hjust, family = caption.family))
 }
 
 
