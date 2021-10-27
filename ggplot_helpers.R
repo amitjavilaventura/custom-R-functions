@@ -1,6 +1,17 @@
 # GGPLOT HELPERS
 # =================================================================================================
 
+## theme_custom() ---------------------------------------------------------------------------------
+## Custom theme for ggplot2-based plots, based on ggpubr::theme_pubr()
+theme_ggvenn <- function(title.hjust = .5, title.face = "plain", subtitle.face = "italic",
+                         title.family = "sans", subtitle.family = "sans",
+                         caption.face = "plain", caption.hjust = 1, caption.family = "sans"){
+
+    theme(plot.title = element_text(face = title.face, hjust = title.hjust, family = title.family),
+          plot.subtitle = element_text(face = subtitle.face, hjust = title.hjust, family = subtitle.family),
+          plot.caption = element_text(face = caption.face, hjust = caption.hjust, family = caption.family))
+}
+
 
 ## theme_custom() ---------------------------------------------------------------------------------
 ## Custom theme for ggplot2-based plots, based on ggpubr::theme_pubr()
