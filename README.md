@@ -22,6 +22,10 @@ It use the R package `here` (if you don't have it).
 
 Paths may have to be changed depending on the current directory where `here` works.
 
+## `count_reads_table.R`
+
+Functions to count reads/counts from FastQC reports, BAM files and featureCounts summary outputs.
+
 ## `pcaplot2.R`
 
 ### `pcaplot2()`
@@ -33,7 +37,6 @@ It takes rlog-transformed DEseq2 dataframe as input.
 Packages used:
 
 * `ggplot2`
-
 
 ## `pieAnno.R`
 
