@@ -88,9 +88,9 @@ stat_info_boxplot <- function(text_size = 2, text_color = "black", width = .5, y
     else if(y == "lower"){ y = mean(fivenum(x)[2:3]) } ## lower part of the box
     else if(y == "min"){ y = fivenum(x)[1] }  ## min value of the boxplot
     else if(y == "max"){ y = fivenum(x)[5] }  ## max value of the boxplot
-    else if(y == "q1"){ y = fivenum(x)[2] }  ## q1 value of the boxplot
-    else if(y %in% c("median", "q3")){ y = fivenum(x)[3] }  ## median value of the boxplot
-    else if(y == "q3"){ y = fivenum(x)[4] }  ## q3 value of the boxplot
+    else if(y == "q1"){ y = fivenum(x)[2] }  ## q1 value of the boxplot (value 25%)
+    else if(y %in% c("median", "q2")){ y = fivenum(x)[3] }  ## median value of the boxplot (value 50%)
+    else if(y == "q3"){ y = fivenum(x)[4] }  ## q3 value of the boxplot (value 75%)
     else if(is.numeric(y)) { y <- y }
 
     x <- x %>% na.omit()
@@ -173,4 +173,24 @@ stat_sum_mean_boxplot <- function(text_size = 2, text_color = "black", width = .
 
   stat_summary(fun.data = calc_mean_boxplot, geom = "text", size = text_size, color = text_color,
                position = position_dodge(width = width))
+}
+
+
+
+## fill facet strips top
+## function to fill facet strips, the output is not a ggplot object
+## so it must be added to other plots with cowplot
+## Credits: I found the original code in issues section of some github repo, but I don't remember
+fill_facet_strips_top <- function(p, colors){
+  g <- ggplot_gtable(ggplot_build(p))
+  strip <- which(grepl('strip-t', g$layout$name))
+  fills <- colors
+  k <- 1
+  for (i in strip_both) {
+    j <- which(grepl('rect', g$grobs[[i]]$grobs[[1]]$childrenOrder))
+    g$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- fills[k]
+    k <- k+1
+  }
+  plot <- cowplot::ggdraw(g)
+  plot
 }

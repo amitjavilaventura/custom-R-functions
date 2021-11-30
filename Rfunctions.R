@@ -6,9 +6,21 @@
 # I use here, because it sets the working directory in the current project directory where I have the folder R with the Rfunctions.R and other scripts
 if(!require(here)){ install.packages("here") }; library(here)
 
+# ----- general helpers ----- #
+# AHelper functions
+source(here::here("R/general_helpers.R"))
+
 # ----- pcaplot2 ----- #
 # A function to plot the principal components analysis
 source(here::here("R/pcaplot2.R"))
+
+# ----- deseq2_helpers ----- #
+# A helper function for deseq
+source(here::here("R/deseq2_helpers.R"))
+
+# ----- count_reads_table.R ----- #
+# count reads
+source(here::here("R/count_reads_table.R"))
 
 # ----- pieAnno3 ----- #
 # pieAnno -> A function to draw pie charts with the peaks divided by promoter, gene body (UTRs, introns, exons) and distal (distal intergeninc, downstream).
@@ -101,4 +113,5 @@ chip_stats <- function(df, conditions = NULL){
   return(stats)
 
 }
+
 
