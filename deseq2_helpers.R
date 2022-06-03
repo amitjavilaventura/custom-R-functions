@@ -23,7 +23,7 @@ deseq_get_results <- function(dds, ref, contrast, pval = 0.05, lfc = 1, lfcShrin
   if(!contrast_name %in% resultsNames(dds)){ stop("The contrast name or the reference are wrong") }
 
   # Get the results
-  res <- DESeq2::results(object = dds, filterFun = ihw, name = contrast_name, alpha = 0.05)
+  res <- DESeq2::results(object = dds, filterFun = ihw, name = contrast_name, alpha = pval, lfcThreshold = lfc)
 
   # LFC shrink
   if(lfcShrink) { res <- DESeq2::lfcShrink(dds = dds, coef = contrast_name, res = res, type = "apeglm") }

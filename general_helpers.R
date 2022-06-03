@@ -36,3 +36,11 @@ bind_cols2 <- function(list, name = names(list)){
   list_bind <- bind_cols(list) %>% magrittr::set_colnames(name)
   return(list_bind)
 }
+
+# add na rows to empty dfs
+add_na_rows <- function(df, numcols=ncol(df), namecols = colnames(df)){
+  if( nrow(df) == 0 ) {
+    df <- df %>% dplyr::bind_rows(data.frame(matrix(rep(NA, numcols), nrow = 1)) %>% magrittr::set_colnames(namecols))
+  }
+  return(df)
+}

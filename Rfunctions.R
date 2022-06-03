@@ -56,6 +56,11 @@ source(here::here("R/setDiff.R"))
 # Functions to use with ggplot2 and customize the plots easily
 source(here::here("R/ggplot_helpers.R"))
 
+# ----- piC Helpers ----- #
+# Functions to use with ggplot2 and customize the plots easily
+source(here::here("R/pic_functions.R"))
+
+
 # ----- GOenrichment ----- #
 # A function that does enrichGO
 # Author: dfernandezperez
