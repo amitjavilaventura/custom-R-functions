@@ -192,3 +192,129 @@ pic_annot_genes <- function(pic_anno, three_utr, gene_set, stranded = T, recipro
 }
 
 
+
+# Annotate transcripts to pics ----------
+pic_annot_trasncripts <- function(pic_anno, gtf, stranded = T, reciprocal_overlap = .33, return_genes = T, gene_biotype = NULL, transcript_biotype = NULL){
+
+  # Load required packages ----------
+  require(plyr)
+  require(dplyr)
+  require(magrittr)
+  require(plyranges)
+  require(bedtoolsr)
+
+  print("Importing and formatting GTF file...")
+  if(is.character(gtf)) { geneset <- plyranges::read_gff(file = gtf) }
+  else { geneset <- gtf }
+
+  geneset <- as.data.frame(geneset) %>%
+    dplyr::mutate(seqnames = paste("chr",seqnames, sep = "") %>% gsub("chrchr", "chr", .)) %>%
+    dplyr::select(seqnames,start,end,gene_id, width, strand, type, gene_name, gene_biotype, transcript_id, transcript_name, transcript_biotype) %>%
+    dplyr::mutate(seqnames = gsub("chrMT", "chrM", seqnames)) %>%
+    dplyr::arrange(seqnames,start) %>%
+    dplyr::mutate(start = ifelse(start < 0, 0, start))
+
+  genes       <- geneset %>% dplyr::filter(type == "gene") %>% dplyr::select(-matches("transcript"))
+  transcripts <- geneset %>% dplyr::filter(type == "transcript") %>% dplyr::filter(transcript_biotype == transcript_biotype) %>%
+    dplyr::select(seqnames,start,end, transcript_id, width, strand, type, gene_name, gene_biotype, gene_id, transcript_name, transcript_biotype)
+  three_utr   <- geneset %>% dplyr::filter(type == "three_prime_utr") %>%
+    dplyr::select(seqnames,start,end, transcript_id, width, strand, type, gene_name, gene_biotype, gene_id, transcript_name, transcript_biotype)
+
+  gene_btype = gene_biotype
+  transcript_btype = transcript_biotype
+
+  if(!is.null(gene_btype)) {
+    genes       <- genes %>% dplyr::filter(gene_biotype == gene_btype)
+    transcripts <- transcripts %>% dplyr::filter(gene_biotype == gene_btype)
+    three_utr   <- three_utr %>% dplyr::filter(gene_biotype == gene_btype)
+  }
+  if(!is.null(transcript_btype)) {
+    transcripts <- transcripts %>% dplyr::filter(transcript_biotype == transcript_btype)
+    three_utr   <- three_utr %>% dplyr::filter(transcript_biotype == transcript_btype)
+  }
+
+
+  bed6_cnames <- c("seqnames", "start", "end", "id", "length", "strand")
+  pic_anno <- pic_anno %>% dplyr::select(1:6) %>% magrittr::set_colnames(bed6_cnames)
+
+  # 3'UTRs
+  pic_3utr <- bedtoolsr::bt.intersect(a = pic_anno, b = three_utr, s = stranded, wo = T, f = reciprocal_overlap, r = T)
+  pic_3utr <- pic_3utr %>%
+    dplyr::select(1:6,V16,V10,V14,V19) %>%
+    magrittr::set_colnames(c(bed6_cnames, "Geneid", "Transcriptid", "Genename", "overlap")) %>%
+    dplyr::mutate(type = "3'UTR")
+
+  # Make sure that one cluster corresponds to only one gene (even with different transcripts)
+  if(c(pic_3utr %>% dplyr::distinct(id,Geneid) %>% dplyr::pull(id) %>% duplicated() %>% sum())>0) {
+    pic_3utr <- pic_3utr %>% dplyr::distinct(id,Geneid) %>% dplyr::filter(duplicated(id)) %>% dplyr::pull(id)
+    print(paste("Some 3'UTR clusters overlap with more than one gene:", paste(dup_genic, collapse = ", ")))
+    print("Retrieving the genes with the maximum overlap with the cluster.")
+    pic_3utr <- pic_3utr %>%
+      dplyr::group_by(id,Geneid) %>% dplyr::mutate(max_overlap = max(overlap)) %>% dplyr::ungroup() %>%
+      dplyr::group_by(id) %>% dplyr::filter(max(overlap) == max_overlap) %>% dplyr::ungroup()  %>%
+      dplyr::select(-max_overlap)
+  }
+
+  # Genes
+  pic_genic <- bedtoolsr::bt.intersect(a = pic_anno, b = transcripts, s = stranded, wo = T, f = reciprocal_overlap, r = T)
+  pic_genic <- pic_genic %>%
+    dplyr::select(1:6,V16,V10,V14,V19) %>%
+    magrittr::set_colnames(c(bed6_cnames, "Geneid", "Transcriptid", "Genename", "overlap")) %>%
+    dplyr::mutate(type = "Genic")
+
+
+  # Make sure that one cluster corresponds to only one gene (even with different transcripts)
+  if(c(pic_genic %>% dplyr::distinct(id,Geneid) %>% dplyr::pull(id) %>% duplicated() %>% sum())>0) {
+    dup_genic <- pic_genic %>% dplyr::distinct(id,Geneid) %>% dplyr::filter(duplicated(id)) %>% dplyr::pull(id)
+    print(paste("Some genic clusters overlap with more than one gene:", paste(dup_genic, collapse = ", ")))
+    print("Retrieving the genes with the maximum overlap with the cluster.")
+    pic_genic <- pic_genic %>%
+      dplyr::group_by(id,Geneid) %>% dplyr::mutate(max_overlap = max(overlap)) %>% dplyr::ungroup() %>%
+      dplyr::group_by(id) %>% dplyr::filter(max(overlap) == max_overlap) %>% dplyr::ungroup()  %>%
+      dplyr::select(-max_overlap)
+  }
+
+  # Look at clusters that appear in the 3'UTR and genic clusters.
+  pic_genic <- pic_genic %>% dplyr::filter(!id %in% pic_3utr$id)
+
+  pic_gene <- dplyr::bind_rows(pic_genic, pic_3utr) %>% dplyr::arrange(seqnames,start) %>% dplyr::select(-overlap)
+
+  # Intergenic piCs
+  pic_inter <- pic_anno %>% dplyr::filter(!id %in% pic_gene$id)
+
+  up_closest   <- bedtoolsr::bt.closest(a = pic_inter, b = genes, io = T, fu = T, D = "a", f = .33, r = T) %>% dplyr::filter(!duplicated(V4)) %>% dplyr::select(V4, V10, V14)
+  down_closest <- bedtoolsr::bt.closest(a = pic_inter, b = genes, io = T, fd = T, D = "a", f = .33, r = T) %>% dplyr::filter(!duplicated(V4)) %>% dplyr::select(V4, V10, V14)
+
+  closest <- dplyr::left_join(up_closest, down_closest, by = "V4") %>%
+    dplyr::mutate(Geneid = ifelse(V10.x < V10.y, paste(V10.x, V10.y, sep = "::"), paste(V10.y, V10.x, sep = "::"))) %>%
+    dplyr::mutate(Genename = ifelse(V14.x < V14.y, paste(V14.x, V14.y, sep = "::"), paste(V14.y, V14.x, sep = "::"))) %>%
+    dplyr::select("id" = V4, Geneid, Genename)
+
+  pic_inter <- pic_inter %>% dplyr::inner_join(closest, by = "id") %>% dplyr::mutate(Transcriptid = "-", type = "Intergenic")
+
+  # Concatenate all piRNA clusters ----------
+  print(paste("Joining all genic and intergenic clusters."))
+  pic_all <- dplyr::bind_rows(pic_gene, pic_inter) %>% dplyr::arrange(seqnames, start)
+
+  # Number of original clusters vs number of annotated clusters.
+  noriginal  = pic_anno %>% nrow()
+  nannotated = pic_all %>% dplyr::distinct(id,Geneid) %>% nrow()
+
+  if(noriginal != nannotated){
+    warning(paste("The number of original clusters(", noriginal, ") is not the same as the number of annotated clusters (", nannotated, ").", sep = ""))
+  } else {
+    print(paste("Number of original clusters:", noriginal))
+    print(paste("Number of annotated clusters:", nannotated))
+  }
+
+  gene_coords <- genes %>% dplyr::inner_join(pic_all %>% dplyr::select(Geneid, id, type) %>% unique(), by = c("gene_id" = "Geneid")) %>% dplyr::select(1:6, gene_name, id, "type" = type.y) %>% unique()
+  transcript_coords <- transcripts %>% dplyr::inner_join(pic_all %>% dplyr::select(Transcriptid, id, type) %>% unique(), by = c("transcript_id" = "Transcriptid")) %>% dplyr::select(1:6, gene_id, gene_name, id, "type" = type.y) %>% unique()
+  utr_coords <- three_utr %>% dplyr::inner_join(pic_all %>% dplyr::select(Transcriptid, id, type) %>% unique(),  by = c("transcript_id" = "Transcriptid")) %>% dplyr::select(1:6, gene_id, gene_name, id, "type" = type.y) %>% unique()
+
+  # Return annotated piCs ----------
+  if(return_genes){ return(list("pics" = pic_all, "genes" = gene_coords, "transcripts" = transcript_coords, "three_utrs" = utr_coords))}
+  else { return(pic_all) }
+
+}
+
+
